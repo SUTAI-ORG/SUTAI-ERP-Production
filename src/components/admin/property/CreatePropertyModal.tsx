@@ -28,6 +28,22 @@ export const CreatePropertyModal: React.FC<CreatePropertyModalProps> = ({
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const handleFormDataChange = (data: {
+    number?: string;
+    x?: number | null;
+    y?: number | null;
+    length?: number | null;
+    width?: number | null;
+    block_id?: number | null;
+    type_id?: number | null;
+    product_type_id?: number | null;
+  }) => {
+    setFormData((prev) => ({
+      ...prev,
+      ...data,
+    }));
+  };
+
   const handleSubmit = async () => {
     // Validate that number is provided
     if (!formData.number?.trim()) {
@@ -128,7 +144,7 @@ export const CreatePropertyModal: React.FC<CreatePropertyModalProps> = ({
           </div>
         )}
 
-        <CreatePropertyForm formData={formData} onFormDataChange={setFormData} />
+        <CreatePropertyForm formData={formData} onFormDataChange={handleFormDataChange} />
         
         <div className="flex items-center justify-end gap-3 p-6 border-t border-slate-200">
           <Button variant="outline" onClick={onClose} disabled={creating}>
