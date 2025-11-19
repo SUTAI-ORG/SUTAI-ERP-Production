@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { toast } from "sonner";
 import { Plus, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { createUser } from "@/lib/api";
@@ -26,19 +27,19 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({
 
   const handleSubmit = async () => {
     if (!formData.name.trim()) {
-      alert("Нэрийг оруулна уу");
+      toast.error("Нэрийг оруулна уу");
       return;
     }
     if (!formData.email.trim()) {
-      alert("Имэйл оруулна уу");
+      toast.error("Имэйл оруулна уу");
       return;
     }
     if (!formData.password.trim() || formData.password.length < 6) {
-      alert("Нууц үг хамгийн багадаа 6 тэмдэгт байх ёстой");
+      toast.error("Нууц үг хамгийн багадаа 6 тэмдэгт байх ёстой");
       return;
     }
     if (formData.role_ids.length === 0) {
-      alert("Хамгийн багадаа нэг эрх сонгоно уу");
+      toast.error("Хамгийн багадаа нэг эрх сонгоно уу");
       return;
     }
     setCreating(true);
@@ -62,12 +63,13 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({
       
       const response = await createUser(userData);
       if (response.error) {
-        alert(response.error || "Алдаа гарлаа");
+        toast.error(response.error || "Алдаа гарлаа");
       } else {
+        toast.success("Хэрэглэгч амжилттай үүсгэгдлээ");
         onSuccess();
       }
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Алдаа гарлаа");
+      toast.error(err instanceof Error ? err.message : "Алдаа гарлаа");
     } finally {
       setCreating(false);
     }

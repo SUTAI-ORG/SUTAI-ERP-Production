@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
+import { toast } from "sonner";
 import { useLeaseRequests } from "@/hooks/useLeaseRequests";
 import { useTenantData } from "@/hooks/useTenantData";
 import { approveLeaseRequest, rejectLeaseRequest } from "@/lib/api";
@@ -56,14 +57,15 @@ const ApprovedTenantList: React.FC<ApprovedTenantListProps> = ({ onTenantClick }
       const response = await approveLeaseRequest(tenantId);
       if (response.error) {
         console.error("Алдаа:", response.error);
-        alert(`Алдаа гарлаа: ${response.error}`);
+        toast.error(`Алдаа гарлаа: ${response.error}`);
       } else {
+        toast.success("Түрээсийн хүсэлт амжилттай батлагдлаа");
         // Refresh the list after successful approval
         await fetchLeaseRequests();
       }
     } catch (err) {
       console.error("Алдаа:", err);
-      alert("Алдаа гарлаа. Дахин оролдоно уу.");
+      toast.error("Алдаа гарлаа. Дахин оролдоно уу.");
     } finally {
       setProcessingIds((prev) => {
         const newSet = new Set(prev);
@@ -83,14 +85,15 @@ const ApprovedTenantList: React.FC<ApprovedTenantListProps> = ({ onTenantClick }
       const response = await rejectLeaseRequest(tenantId);
       if (response.error) {
         console.error("Алдаа:", response.error);
-        alert(`Алдаа гарлаа: ${response.error}`);
+        toast.error(`Алдаа гарлаа: ${response.error}`);
       } else {
+        toast.success("Түрээсийн хүсэлт амжилттай татгалзлаа");
         // Refresh the list after successful rejection
         await fetchLeaseRequests();
       }
     } catch (err) {
       console.error("Алдаа:", err);
-      alert("Алдаа гарлаа. Дахин оролдоно уу.");
+      toast.error("Алдаа гарлаа. Дахин оролдоно уу.");
     } finally {
       setProcessingIds((prev) => {
         const newSet = new Set(prev);

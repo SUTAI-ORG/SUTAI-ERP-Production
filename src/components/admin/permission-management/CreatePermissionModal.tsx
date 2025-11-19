@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { toast } from "sonner";
 import { Plus, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { createPermission } from "@/lib/api";
@@ -19,15 +20,16 @@ export const CreatePermissionModal: React.FC<CreatePermissionModalProps> = ({
 
   const handleSubmit = async () => {
     if (!title.trim()) {
-      alert("Зөвшөөрлийн нэрийг оруулна уу");
+      toast.error("Зөвшөөрлийн нэрийг оруулна уу");
       return;
     }
     setCreating(true);
     try {
       await createPermission({ title });
+      toast.success("Зөвшөөрөл амжилттай үүсгэгдлээ");
       onSuccess();
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Алдаа гарлаа");
+      toast.error(err instanceof Error ? err.message : "Алдаа гарлаа");
     } finally {
       setCreating(false);
     }

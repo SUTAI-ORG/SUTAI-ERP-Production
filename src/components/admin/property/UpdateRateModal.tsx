@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { toast } from "sonner";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -96,6 +97,7 @@ export const UpdateRateModal: React.FC<UpdateRateModalProps> = ({
       };
       
       await onUpdateRate(property.id, rateDataToSend);
+      toast.success("Үнэлгээ амжилттай шинэчлэгдлээ");
       // Call onSuccess before closing to ensure data is refreshed
       onSuccess();
       // Small delay to ensure the refresh happens before closing
@@ -105,6 +107,7 @@ export const UpdateRateModal: React.FC<UpdateRateModalProps> = ({
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Алдаа гарлаа";
       setError(errorMessage);
+      toast.error(errorMessage);
       console.error("Rate request creation error:", err);
     } finally {
       setUpdating(false);

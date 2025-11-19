@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
+import { toast } from "sonner";
 import { Key, Plus, Edit, Trash2, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { usePermissions } from "@/hooks/usePermissions";
@@ -23,8 +24,9 @@ export const PermissionsList: React.FC = () => {
     if (confirm("Энэ зөвшөөрлийг устгахдаа итгэлтэй байна уу?")) {
       try {
         await deletePermission(id);
+        toast.success("Зөвшөөрөл амжилттай устгагдлаа");
       } catch (err) {
-        alert(err instanceof Error ? err.message : "Алдаа гарлаа");
+        toast.error(err instanceof Error ? err.message : "Алдаа гарлаа");
       }
     }
   };

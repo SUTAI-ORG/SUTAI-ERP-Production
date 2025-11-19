@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { toast } from "sonner";
 import { Edit, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { updatePermission } from "@/lib/api";
@@ -25,15 +26,16 @@ export const EditPermissionModal: React.FC<EditPermissionModalProps> = ({
 
   const handleSubmit = async () => {
     if (!title.trim()) {
-      alert("Зөвшөөрлийн нэрийг оруулна уу");
+      toast.error("Зөвшөөрлийн нэрийг оруулна уу");
       return;
     }
     setUpdating(true);
     try {
       await updatePermission(permission.id, { title });
+      toast.success("Зөвшөөрөл амжилттай шинэчлэгдлээ");
       onSuccess();
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Алдаа гарлаа");
+      toast.error(err instanceof Error ? err.message : "Алдаа гарлаа");
     } finally {
       setUpdating(false);
     }

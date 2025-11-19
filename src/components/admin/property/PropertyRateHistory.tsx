@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { toast } from "sonner";
 import { Calendar, DollarSign, Clock, CheckCircle, XCircle, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Pagination } from "@/components/ui/pagination";
@@ -188,7 +189,7 @@ export const PropertyRateHistory: React.FC = () => {
     if (processingIds.has(rateId)) return;
     
     // Reject функц одоогоор дэмжигдэхгүй байна
-    alert("Татгалзах функц одоогоор дэмжигдэхгүй байна");
+    toast.info("Татгалзах функц одоогоор дэмжигдэхгүй байна");
     return;
     
     // Code below is disabled until reject endpoint is available

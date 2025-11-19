@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { Toaster } from "sonner";
 import { Sidebar } from "@/components/core-components/Sidebar";
 import Header from "@/components/core-components/header";
 import Footer from "@/components/core-components/footer";
@@ -33,6 +34,7 @@ function MainLayoutContent({
           <Footer />
         </main>
       </div>
+      <Toaster position="top-right" richColors />
     </div>
   );
 }

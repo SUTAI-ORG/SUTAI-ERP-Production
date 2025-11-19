@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { toast } from "sonner";
 import { X, Calendar, DollarSign, Clock, CheckCircle, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getAnnualRates } from "@/lib/api";
@@ -36,8 +37,6 @@ export const PropertyRateHistoryModal: React.FC<PropertyRateHistoryModalProps> =
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [processingIds, setProcessingIds] = useState<Set<number>>(new Set());
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
     if (property?.id) {
@@ -133,30 +132,25 @@ export const PropertyRateHistoryModal: React.FC<PropertyRateHistoryModalProps> =
 
   const handleApprove = async (rateId: number) => {
     if (!property?.id || !rateId || rateId === 0) {
-      setErrorMessage("Үнэлгээний ID олдсонгүй");
-      setTimeout(() => setErrorMessage(null), 5000);
+      toast.error("Үнэлгээний ID олдсонгүй");
       return;
     }
 
     if (processingIds.has(rateId)) return;
     
     setProcessingIds((prev) => new Set(prev).add(rateId));
-    setSuccessMessage(null);
-    setErrorMessage(null);
     
     try {
       if (onApprove) {
         await onApprove(property.id, rateId);
-        setSuccessMessage("Үнэлгээ амжилттай баталгаажлаа");
-        setTimeout(() => setSuccessMessage(null), 3000);
+        toast.success("Үнэлгээ амжилттай баталгаажлаа");
       }
       // Refresh rates after approval
       await fetchRateHistory();
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : "Баталгаажуулахад алдаа гарлаа";
-      setErrorMessage(errorMsg);
+      toast.error(errorMsg);
       console.error("Failed to approve rate:", err);
-      setTimeout(() => setErrorMessage(null), 5000);
     } finally {
       setProcessingIds((prev) => {
         const newSet = new Set(prev);
@@ -168,8 +162,7 @@ export const PropertyRateHistoryModal: React.FC<PropertyRateHistoryModalProps> =
 
   const handleReject = async (rateId: number) => {
     if (!property?.id || !rateId || rateId === 0) {
-      setErrorMessage("Үнэлгээний ID олдсонгүй");
-      setTimeout(() => setErrorMessage(null), 5000);
+      toast.error("Үнэлгээний ID олдсонгүй");
       return;
     }
 
@@ -180,22 +173,18 @@ export const PropertyRateHistoryModal: React.FC<PropertyRateHistoryModalProps> =
     if (!confirmed) return;
     
     setProcessingIds((prev) => new Set(prev).add(rateId));
-    setSuccessMessage(null);
-    setErrorMessage(null);
     
     try {
       if (onReject) {
         await onReject(property.id, rateId);
-        setSuccessMessage("Үнэлгээ амжилттай татгалзлаа");
-        setTimeout(() => setSuccessMessage(null), 3000);
+        toast.success("Үнэлгээ амжилттай татгалзлаа");
       }
       // Refresh rates after rejection
       await fetchRateHistory();
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : "Татгалзахад алдаа гарлаа";
-      setErrorMessage(errorMsg);
+      toast.error(errorMsg);
       console.error("Failed to reject rate:", err);
-      setTimeout(() => setErrorMessage(null), 5000);
     } finally {
       setProcessingIds((prev) => {
         const newSet = new Set(prev);
@@ -236,28 +225,6 @@ export const PropertyRateHistoryModal: React.FC<PropertyRateHistoryModalProps> =
             </div>
           )}
 
-          {successMessage && (
-            <div className="rounded-lg bg-green-50 border border-green-200 p-4 mb-4 flex items-center justify-between">
-              <p className="text-sm text-green-600">{successMessage}</p>
-              <button
-                onClick={() => setSuccessMessage(null)}
-                className="text-green-600 hover:text-green-800"
-              >
-                <XCircle className="h-4 w-4" />
-              </button>
-            </div>
-          )}
-          {errorMessage && (
-            <div className="rounded-lg bg-red-50 border border-red-200 p-4 mb-4 flex items-center justify-between">
-              <p className="text-sm text-red-600">{errorMessage}</p>
-              <button
-                onClick={() => setErrorMessage(null)}
-                className="text-red-600 hover:text-red-800"
-              >
-                <XCircle className="h-4 w-4" />
-              </button>
-            </div>
-          )}
 
           {loading ? (
             <div className="flex items-center justify-center py-12">

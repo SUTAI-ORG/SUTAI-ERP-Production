@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { toast } from "sonner";
 import { getPermissions, createRole } from "@/lib/api";
 import { PermissionOption } from "@/components/admin/permission-management/CreateRoleModal";
 
@@ -31,11 +32,11 @@ export const useCreateRole = (showModal: boolean, onSuccess: () => void) => {
 
   const handleCreateRole = async () => {
     if (!formData.title.trim()) {
-      alert("Эрхийн нэрийг оруулна уу");
+      toast.error("Эрхийн нэрийг оруулна уу");
       return;
     }
     if (formData.permission_ids.length === 0) {
-      alert("Хамгийн багадаа нэг зөвшөөрөл сонгоно уу");
+      toast.error("Хамгийн багадаа нэг зөвшөөрөл сонгоно уу");
       return;
     }
     setCreating(true);
@@ -45,13 +46,14 @@ export const useCreateRole = (showModal: boolean, onSuccess: () => void) => {
         permission_ids: formData.permission_ids,
       });
       if (response.error) {
-        alert(response.error);
+        toast.error(response.error);
       } else {
+        toast.success("Эрх амжилттай үүсгэгдлээ");
         setFormData({ title: "", permission_ids: [] });
         onSuccess();
       }
     } catch (err) {
-      alert("Алдаа гарлаа");
+      toast.error("Алдаа гарлаа");
     } finally {
       setCreating(false);
     }

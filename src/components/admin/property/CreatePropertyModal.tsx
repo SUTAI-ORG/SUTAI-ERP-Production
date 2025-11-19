@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { toast } from "sonner";
 import { Plus, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { createProperty } from "@/lib/api";
@@ -107,12 +108,16 @@ export const CreatePropertyModal: React.FC<CreatePropertyModalProps> = ({
       const response = await createProperty(propertyData);
       if (response.error) {
         setError(response.error || response.message || "Алдаа гарлаа");
+        toast.error(response.error || response.message || "Алдаа гарлаа");
       } else {
+        toast.success("Талбай амжилттай үүсгэгдлээ");
         onSuccess();
         onClose();
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Алдаа гарлаа");
+      const errorMsg = err instanceof Error ? err.message : "Алдаа гарлаа";
+      setError(errorMsg);
+      toast.error(errorMsg);
     } finally {
       setCreating(false);
     }

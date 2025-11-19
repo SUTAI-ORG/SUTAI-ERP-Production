@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { toast } from "sonner";
 import {
   ArrowLeft,
   Edit,
@@ -136,7 +137,7 @@ const ContractFormDetail = ({ tenantId, onBack }: ContractFormDetailProps) => {
   const handleSubmit = async () => {
     // TODO: Implement submit API call
     setIsSubmitted(true);
-    alert("Бүрдүүлбэр амжилттай илгээгдлээ");
+    toast.success("Бүрдүүлбэр амжилттай илгээгдлээ");
   };
 
   const renderStepContent = () => {

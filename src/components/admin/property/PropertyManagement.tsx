@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { getProperties, getProperty, getPropertyTypes, getProductTypes, getServiceCategories, getBlocks, updatePropertyRate, createAnnualRate, approveAnnualRate, rejectAnnualRate, getAnnualRates } from "@/lib/api";
 import { Pagination } from "../../ui/pagination";
 import PropertyHeader from "./PropertyHeader";
@@ -67,16 +68,25 @@ const PropertyManagement: React.FC = () => {
         // Fetch approved rates for all properties and attach the latest approved rate
         // If no approved rate, use the current active rate from property
         try {
-          // Fetch all pages of annual rates to get all approved rates
+          // Fetch approved rates with pagination limit to avoid too many requests
           let allApprovedRates: any[] = [];
           let currentPage = 1;
           let hasMorePages = true;
-          const perPage = 100; // Fetch 100 per page
+          const perPage = 50; // Fetch 50 per page as per API specification
+          const maxPages = 5; // Limit to maximum 5 pages to avoid rate limiting
           
-          while (hasMorePages) {
+          while (hasMorePages && currentPage <= maxPages) {
             const ratesResponse = await getAnnualRates(null, null, currentPage, perPage);
+            
+            // Handle rate limiting errors
+            if (ratesResponse.status === 429 || (ratesResponse.error && ratesResponse.error.includes("Too Many Attempts"))) {
+              console.warn("Rate limit reached, stopping rate fetch");
+              break;
+            }
+            
             if (ratesResponse.error && ratesResponse.status !== 404) {
-              throw new Error(ratesResponse.error);
+              console.warn("Error fetching rates:", ratesResponse.error);
+              break;
             }
             
             if (ratesResponse.data) {
@@ -421,7 +431,7 @@ const PropertyManagement: React.FC = () => {
   const handleEdit = (property: Property) => {
     // TODO: Implement edit functionality
     console.log("Edit property:", property);
-    alert("Засах функц хэрэгжүүлэгдээгүй байна");
+    toast.info("Засах функц хэрэгжүүлэгдээгүй байна");
   };
 
   const handleAdd = () => {
@@ -586,7 +596,7 @@ const PropertyManagement: React.FC = () => {
       while (hasMorePages) {
         const response = await getProperties(currentPage, perPage, selectedTypeId, selectedProductTypeId, debouncedSearchQuery);
         if (response.error) {
-          alert(`Excel татахад алдаа гарлаа: ${response.error}`);
+          toast.error(`Excel татахад алдаа гарлаа: ${response.error}`);
           return;
         }
         
@@ -621,13 +631,14 @@ const PropertyManagement: React.FC = () => {
       }
       
       if (allProperties.length === 0) {
-        alert("Татаж болох мэдээлэл байхгүй байна");
+        toast.warning("Татаж болох мэдээлэл байхгүй байна");
         return;
       }
       
       exportPropertiesToExcel(allProperties, 'Талбайн_мэдээлэл');
+      toast.success("Excel файл амжилттай татагдлаа");
     } catch (err) {
-      alert(`Excel татахад алдаа гарлаа: ${err instanceof Error ? err.message : "Алдаа гарлаа"}`);
+      toast.error(`Excel татахад алдаа гарлаа: ${err instanceof Error ? err.message : "Алдаа гарлаа"}`);
     }
   };
 
