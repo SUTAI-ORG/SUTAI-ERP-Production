@@ -67,8 +67,8 @@ export const useLeaseRequests = () => {
         // Store status options if available
         if (paginationInfo.status_options) {
           setStatusOptions(paginationInfo.status_options);
-        } else if (response.data.status_options) {
-          setStatusOptions(response.data.status_options);
+        } else if ((response.data as any)?.status_options) {
+          setStatusOptions((response.data as any).status_options);
         }
       } else {
         setError("Түрээсийн гэрээний мэдээлэл олдсонгүй");
