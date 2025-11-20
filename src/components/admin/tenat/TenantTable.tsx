@@ -7,7 +7,7 @@ import { TenantTableRow } from "./TenantTableRow";
 interface TenantTableProps {
   tenants: Tenant[];
   loading: boolean;
-  statusOptions: { [key: string]: string };
+  statusOptions: { [key: string]: string | { name?: string; style?: string; description?: string } };
   onTenantClick?: (tenantId: number) => void;
   onStatusChange?: (tenantId: number, newStatus: string) => void;
   onApprove?: (tenantId: number) => void;

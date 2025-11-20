@@ -622,10 +622,6 @@ export const getProperties = async (
     params.search = search.trim();
   }
   
-  // Debug: Log the params to verify product_type_id is included
-  if (process.env.NODE_ENV === 'development') {
-    console.log('getProperties params:', params);
-  }
   
   return get("/v1/properties", {
     params,
@@ -695,20 +691,7 @@ export const updatePropertyRate = async (
     requestBody.product_type_id = productTypeId;
   }
   
-  // Debug: Log the request body
-  if (process.env.NODE_ENV === 'development') {
-    console.log('Update rate request:', {
-      propertyId,
-      requestBody,
-    });
-  }
-  
   const response = await put(`/v1/properties/${propertyId}/rate`, requestBody);
-  
-  // Debug: Log the response
-  if (process.env.NODE_ENV === 'development') {
-    console.log('Update rate response:', response);
-  }
   
   return response;
 };
@@ -816,19 +799,7 @@ export const createProperty = async (
     status_id?: number | null;
   }
 ): Promise<ApiResponse<any>> => {
-  // Debug: Log the request body
-  if (process.env.NODE_ENV === 'development') {
-    console.log('Create property request:', {
-      propertyData,
-    });
-  }
-  
   const response = await post(`/v1/properties`, propertyData);
-  
-  // Debug: Log the response
-  if (process.env.NODE_ENV === 'development') {
-    console.log('Create property response:', response);
-  }
   
   return response;
 };
@@ -854,20 +825,7 @@ export const updateProperty = async (
     status_id?: number | null;
   }
 ): Promise<ApiResponse<any>> => {
-  // Debug: Log the request body
-  if (process.env.NODE_ENV === 'development') {
-    console.log('Update property request:', {
-      propertyId,
-      propertyData,
-    });
-  }
-  
   const response = await put(`/v1/properties/${propertyId}`, propertyData);
-  
-  // Debug: Log the response
-  if (process.env.NODE_ENV === 'development') {
-    console.log('Update property response:', response);
-  }
   
   return response;
 };

@@ -75,7 +75,6 @@ const TenantList: React.FC<TenantListProps> = ({ onTenantClick }) => {
 
   const handleStatusChange = async (tenantId: number, newStatus: string) => {
     // TODO: Implement status update API call
-    console.log("Update status:", tenantId, newStatus);
     // After successful update, refresh the list
     // fetchLeaseRequests();
   };

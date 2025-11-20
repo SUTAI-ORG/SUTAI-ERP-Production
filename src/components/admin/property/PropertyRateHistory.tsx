@@ -79,16 +79,6 @@ export const PropertyRateHistory: React.FC = () => {
       if (ratesResponse.data) {
         const responseData = ratesResponse.data as any;
         
-        // Debug: log response structure
-        if (process.env.NODE_ENV === 'development') {
-          console.log('Annual rates response:', {
-            hasData: !!responseData.data,
-            dataLength: responseData.data?.length,
-            hasMeta: !!responseData.meta,
-            meta: responseData.meta,
-            firstRate: responseData.data?.[0],
-          });
-        }
         
         // Check response structure - backend returns { data: [...], meta: {...} }
         if (responseData.data && Array.isArray(responseData.data)) {
@@ -99,15 +89,6 @@ export const PropertyRateHistory: React.FC = () => {
           // Structure: { data: [...] } - no pagination
           ratesData = responseData;
         }
-      }
-      
-      // Debug: log rates data
-      if (process.env.NODE_ENV === 'development') {
-        console.log('Parsed rates:', {
-          count: ratesData.length,
-          statusIds: ratesData.map((r: any) => r.status_id),
-          pendingCount: ratesData.filter((r: any) => r.status_id !== 29).length,
-        });
       }
 
       // Map properties to rates - use property from API response if available

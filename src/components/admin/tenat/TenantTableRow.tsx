@@ -7,7 +7,7 @@ import { Tenant } from "./types";
 
 interface TenantTableRowProps {
   tenant: Tenant;
-  statusOptions: { [key: string]: string };
+  statusOptions: { [key: string]: string | { name?: string; style?: string; description?: string } };
   onTenantClick?: (tenantId: number) => void;
   onApprove?: (tenantId: number) => void;
   onReject?: (tenantId: number) => void;
@@ -45,7 +45,28 @@ const getStatusColor = (status: string) => {
 };
 
 export const TenantTableRow: React.FC<TenantTableRowProps> = ({ tenant, statusOptions, onTenantClick, onApprove, onReject, isProcessing = false }) => {
-  const statusLabel = tenant.status && statusOptions[tenant.status] ? statusOptions[tenant.status] : tenant.status || "-";
+  // Handle statusOptions that might be an object with {name, style, description} or a simple string
+  const getStatusLabel = () => {
+    if (!tenant.status) return "-";
+    
+    const statusValue = statusOptions[tenant.status];
+    if (!statusValue) return tenant.status;
+    
+    // If statusValue is an object with a 'name' property, use that
+    if (typeof statusValue === 'object' && statusValue !== null && 'name' in statusValue) {
+      return (statusValue as any).name;
+    }
+    
+    // If statusValue is a string, use it directly
+    if (typeof statusValue === 'string') {
+      return statusValue;
+    }
+    
+    // Fallback to tenant.status
+    return tenant.status;
+  };
+  
+  const statusLabel = getStatusLabel();
   const hasPropertyId = tenant.propertyId !== null && tenant.propertyId !== undefined;
   
   return (

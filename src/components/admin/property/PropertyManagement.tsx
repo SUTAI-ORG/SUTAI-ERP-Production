@@ -121,17 +121,6 @@ const PropertyManagement: React.FC = () => {
             }
           }
           
-          // Debug log: total approved rates found
-          if (process.env.NODE_ENV === 'development') {
-            console.log(`Total approved rates found: ${allApprovedRates.length}`, {
-              sampleRates: allApprovedRates.slice(0, 5).map((r: any) => ({
-                id: r.id,
-                property_id: r.property_id,
-                rate: r.rate,
-                status_id: r.status_id,
-              })),
-            });
-          }
           
           // Map approved rates to properties - find the latest approved rate for each property
           const propertiesWithApprovedRates = propertiesData.map((prop: Property) => {
@@ -148,26 +137,11 @@ const PropertyManagement: React.FC = () => {
               
               const latestApprovedRate = sortedRates[0];
               
-              // Debug log
-              if (process.env.NODE_ENV === 'development') {
-                console.log(`Property ${prop.id} (${prop.number}): Found approved rate`, {
-                  rateId: latestApprovedRate.id,
-                  rate: latestApprovedRate.rate,
-                  statusId: latestApprovedRate.status_id,
-                  year: latestApprovedRate.year,
-                });
-              }
-              
               // Use approved rate
               return {
                 ...prop,
                 rate: latestApprovedRate,
               };
-            }
-            
-            // Debug log for properties without approved rates
-            if (process.env.NODE_ENV === 'development') {
-              console.log(`Property ${prop.id} (${prop.number}): No approved rate found, using property.rate:`, prop.rate);
             }
             
             // If no approved rate, use the current active rate from property (if exists)
@@ -430,7 +404,6 @@ const PropertyManagement: React.FC = () => {
 
   const handleEdit = (property: Property) => {
     // TODO: Implement edit functionality
-    console.log("Edit property:", property);
     toast.info("Засах функц хэрэгжүүлэгдээгүй байна");
   };
 
@@ -509,10 +482,6 @@ const PropertyManagement: React.FC = () => {
       product_type_id: productTypeId,
     });
     
-    // Log full response for debugging
-    if (process.env.NODE_ENV === 'development') {
-      console.log("Rate request creation response:", response);
-    }
     
     if (response.error || !response.data) {
       // Show detailed error message
@@ -572,7 +541,6 @@ const PropertyManagement: React.FC = () => {
     try {
       // Refresh properties after successful rate update
       await fetchProperties(currentPage, selectedTypeId, selectedProductTypeId, debouncedSearchQuery);
-      console.log('Properties refreshed after rate update');
     } catch (error) {
       console.error('Error refreshing properties:', error);
     }

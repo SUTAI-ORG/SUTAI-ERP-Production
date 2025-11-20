@@ -44,11 +44,6 @@ const SignInPage = () => {
         return;
       }
 
-      // Debug: Log full response structure
-      console.log("Full login response:", response);
-      console.log("Response data:", response.data);
-      console.log("Response data type:", typeof response.data);
-      
       // Check if response.data is a string (IP address or other)
       if (typeof response.data === "string") {
         setError(` ${response.data}.`);
@@ -71,11 +66,6 @@ const SignInPage = () => {
         const userData = response.data?.user || response.data?.data?.user;
         if (userData) {
           localStorage.setItem("user", JSON.stringify(userData));
-        }
-        
-        // Debug: Log response in development
-        if (process.env.NODE_ENV === "development") {
-          console.log("Login successful:", { token: token.substring(0, 20) + "...", userData });
         }
         
         // Redirect to main page

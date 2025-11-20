@@ -94,7 +94,6 @@ const ContractProcess: React.FC<ContractProcessProps> = ({ onTenantClick }) => {
 
   const handleStatusChange = async (tenantId: number, newStatus: string) => {
     // TODO: Implement status update API call
-    console.log("Update status:", tenantId, newStatus);
   };
 
   return (
