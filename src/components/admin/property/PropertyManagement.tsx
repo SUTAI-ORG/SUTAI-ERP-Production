@@ -44,7 +44,7 @@ const PropertyManagement: React.FC = () => {
       const filterTypeId = typeId !== undefined ? typeId : selectedTypeId;
       const filterProductTypeId = productTypeId !== undefined ? productTypeId : selectedProductTypeId;
       const filterSearch = search !== undefined ? search : debouncedSearchQuery;
-      const propertiesResponse = await getProperties(page, 32, filterTypeId, filterProductTypeId, filterSearch);
+      const propertiesResponse = await getProperties(page, 32, filterTypeId, filterProductTypeId, filterSearch, "created_at", "asc");
 
       if (propertiesResponse.error) {
         setError(propertiesResponse.error);
@@ -282,7 +282,7 @@ const PropertyManagement: React.FC = () => {
       setLoading(true);
       setError(null);
       try {
-        const propertiesResponse = await getProperties(1, 32, selectedTypeId, selectedProductTypeId, debouncedSearchQuery);
+        const propertiesResponse = await getProperties(1, 32, selectedTypeId, selectedProductTypeId, debouncedSearchQuery, "created_at", "asc");
         
         if (propertiesResponse.error) {
           setError(propertiesResponse.error);
@@ -562,7 +562,7 @@ const PropertyManagement: React.FC = () => {
 
       // Fetch all pages
       while (hasMorePages) {
-        const response = await getProperties(currentPage, perPage, selectedTypeId, selectedProductTypeId, debouncedSearchQuery);
+        const response = await getProperties(currentPage, perPage, selectedTypeId, selectedProductTypeId, debouncedSearchQuery, "created_at", "asc");
         if (response.error) {
           toast.error(`Excel татахад алдаа гарлаа: ${response.error}`);
           return;

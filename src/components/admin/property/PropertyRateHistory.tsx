@@ -51,7 +51,7 @@ export const PropertyRateHistory: React.FC = () => {
     setError(null);
     try {
       // Fetch all properties
-      const propertiesResponse = await getProperties(1, 1000);
+      const propertiesResponse = await getProperties(1, 1000, null, null, null, "created_at", "asc");
       if (propertiesResponse.error) {
         throw new Error(propertiesResponse.error);
       }

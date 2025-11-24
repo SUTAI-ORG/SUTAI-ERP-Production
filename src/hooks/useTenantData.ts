@@ -24,7 +24,7 @@ export const useTenantData = (leaseRequests: any[]) => {
         // Silently fail - will show ID if types not available
       });
 
-    getProperties()
+    getProperties(1, 100, null, null, null, "created_at", "asc")
       .then((response) => {
         if (response.data?.data) {
           const propertiesMap: Record<number, string> = {};

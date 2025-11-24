@@ -574,16 +574,20 @@ export const updateLeaseRequestStatus = async (
 
 /**
  * Approve lease request API function
+ * Uses /v1/lease-requests/:id/approve endpoint
  */
 export const approveLeaseRequest = async (id: number): Promise<ApiResponse<any>> => {
-  return updateLeaseRequestStatus(id, "approved");
+  // Use PUT method to approve lease request
+  return put(`/v1/lease-requests/${id}/approve`, {});
 };
 
 /**
  * Reject lease request API function
+ * Uses /v1/lease-requests/:id/reject endpoint
  */
 export const rejectLeaseRequest = async (id: number): Promise<ApiResponse<any>> => {
-  return updateLeaseRequestStatus(id, "rejected");
+  // Use PUT method to reject lease request
+  return put(`/v1/lease-requests/${id}/reject`, {});
 };
 
 /**
@@ -601,12 +605,45 @@ export const getProperties = async (
   perPage: number = 32,
   typeId?: number | null,
   productTypeId?: number | null,
-  search?: string | null
+  search?: string | null,
+  orderby?: string | null,
+  order?: string | null,
+  relationship?: string | null,
+  relationshipId?: number | null
 ): Promise<ApiResponse<{ data: any[] }>> => {
   const params: Record<string, string | number> = {
     page,
     per_page: perPage,
   };
+  
+  // Add orderby parameter (default: created_at)
+  if (orderby !== null && orderby !== undefined && orderby.trim() !== "") {
+    params.orderby = orderby.trim();
+  } else {
+    params.orderby = "created_at";
+  }
+  
+  // Add order parameter (default: asc)
+  if (order !== null && order !== undefined && order.trim() !== "") {
+    params.order = order.trim();
+  } else {
+    params.order = "asc";
+  }
+  
+  // Add relationship parameter
+  if (relationship !== null && relationship !== undefined && relationship.trim() !== "") {
+    params.relationship = relationship.trim();
+  }
+  
+  // Add relationship_id parameter
+  if (relationshipId !== null && relationshipId !== undefined && relationshipId !== 0) {
+    params.relationship_id = relationshipId;
+  }
+  
+  // Add search query parameter (using 'q' instead of 'search')
+  if (search !== null && search !== undefined && search.trim() !== "") {
+    params.q = search.trim();
+  }
   
   if (typeId !== null && typeId !== undefined && typeId !== 0) {
     params.type_id = typeId;
@@ -616,12 +653,6 @@ export const getProperties = async (
   if (productTypeId !== null && productTypeId !== undefined && productTypeId !== 0) {
     params.product_type_id = productTypeId;
   }
-  
-  // Add search query parameter
-  if (search !== null && search !== undefined && search.trim() !== "") {
-    params.search = search.trim();
-  }
-  
   
   return get("/v1/properties", {
     params,
