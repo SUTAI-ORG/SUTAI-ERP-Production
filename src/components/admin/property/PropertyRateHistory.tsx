@@ -2,10 +2,10 @@
 
 import React, { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { Calendar, DollarSign, Clock, CheckCircle, XCircle, Loader2 } from "lucide-react";
+import { DollarSign, Clock, CheckCircle, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Pagination } from "@/components/ui/pagination";
-import { getAnnualRates, approveAnnualRate, rejectAnnualRate } from "@/lib/api";
+import { getAnnualRates, approveAnnualRate,  } from "@/lib/api";
 import { Property } from "./types";
 import { getProperties } from "@/lib/api";
 
@@ -139,7 +139,7 @@ export const PropertyRateHistory: React.FC = () => {
 
   const handleApproveRate = async (propertyId: number, rateId: number) => {
     if (!rateId || rateId === 0) {
-      console.error("Invalid rateId:", rateId);
+      toast.error("Үнэлгээний ID буруу байна");
       return;
     }
     
@@ -155,7 +155,8 @@ export const PropertyRateHistory: React.FC = () => {
       // Refresh data after approval
       await fetchData();
     } catch (err) {
-      console.error("Failed to approve rate:", err);
+      const errorMsg = err instanceof Error ? err.message : "Баталгаажуулахад алдаа гарлаа";
+      toast.error(errorMsg);
       throw err;
     } finally {
       setProcessingIds((prev) => {
@@ -163,51 +164,6 @@ export const PropertyRateHistory: React.FC = () => {
         newSet.delete(rateId);
         return newSet;
       });
-    }
-  };
-
-  const handleRejectRate = async (propertyId: number, rateId: number) => {
-    if (processingIds.has(rateId)) return;
-    
-    // Reject функц одоогоор дэмжигдэхгүй байна
-    toast.info("Татгалзах функц одоогоор дэмжигдэхгүй байна");
-    return;
-    
-    // Code below is disabled until reject endpoint is available
-    /*
-    setProcessingIds((prev) => new Set(prev).add(rateId));
-    
-    try {
-      const response = await rejectAnnualRate(propertyId, rateId);
-      if (response.error) {
-        throw new Error(response.error || "Татгалзахад алдаа гарлаа");
-      }
-      // Refresh data after rejection
-      await fetchData();
-    } catch (err) {
-      console.error("Failed to reject rate:", err);
-      throw err;
-    } finally {
-      setProcessingIds((prev) => {
-        const newSet = new Set(prev);
-        newSet.delete(rateId);
-        return newSet;
-      });
-    }
-    */
-  };
-
-  const formatDate = (dateString?: string | null) => {
-    if (!dateString) return "-";
-    try {
-      const date = new Date(dateString);
-      return date.toLocaleDateString("mn-MN", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      });
-    } catch {
-      return dateString;
     }
   };
 
@@ -329,9 +285,6 @@ export const PropertyRateHistory: React.FC = () => {
                   <th className="px-6 py-3 text-left text-xs font-medium text-slate-700 uppercase">
                     Төлөв
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-700 uppercase">
-                    Огноо
-                  </th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-slate-700 uppercase">
                     Үйлдэл
                   </th>
@@ -365,11 +318,6 @@ export const PropertyRateHistory: React.FC = () => {
                     </td>
                     <td className="px-6 py-4">
                       {getStatusBadge(rate.status_id, rate.status)}
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className="text-sm text-slate-600">
-                        {formatDate(rate.created_at)}
-                      </span>
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center justify-end gap-2">

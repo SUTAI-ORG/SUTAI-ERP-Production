@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Tenant } from "./types";
+import { Tenant, FilterType } from "./types";
 import { TenantTableRow } from "./TenantTableRow";
 
 interface TenantTableProps {
@@ -12,12 +12,15 @@ interface TenantTableProps {
   onStatusChange?: (tenantId: number, newStatus: string) => void;
   onApprove?: (tenantId: number) => void;
   onReject?: (tenantId: number) => void;
-  filterType?: "new" | "renewal" | "rejected";
+  filterType?: FilterType;
   processingIds?: Set<number>;
+  showActions?: boolean; // Show approve/reject buttons, default true
 }
 
-export const TenantTable: React.FC<TenantTableProps> = ({ tenants, loading, statusOptions, onTenantClick, onStatusChange, onApprove, onReject, filterType, processingIds }) => {
-  const isRenewal = filterType === "renewal";
+export const TenantTable: React.FC<TenantTableProps> = ({ tenants, loading, statusOptions, onTenantClick, onStatusChange, onApprove, onReject, filterType, processingIds, showActions = true }) => {
+  // Determine if we should show "Лангуу" based on whether tenants have propertyId
+  // If all tenants have propertyId, show "Лангуу", otherwise show "Үйл ажиллагааны төрөл"
+  const isRenewal = tenants.length > 0 && tenants.every((tenant) => tenant.propertyId !== null && tenant.propertyId !== undefined);
   
   return (
     <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
@@ -30,7 +33,6 @@ export const TenantTable: React.FC<TenantTableProps> = ({ tenants, loading, stat
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-slate-700 uppercase">Харилцагчийн нэр</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-slate-700 uppercase">Утасны дугаар</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-slate-700 uppercase">Имэйл</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-slate-700 uppercase">Тайлбар</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-slate-700 uppercase">Төлөв</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-slate-700 uppercase">Үйлдэл</th>
@@ -65,6 +67,7 @@ export const TenantTable: React.FC<TenantTableProps> = ({ tenants, loading, stat
                   onApprove={onApprove}
                   onReject={onReject}
                   isProcessing={processingIds?.has(tenant.id) || false}
+                  showActions={showActions}
                 />
               ))
             )}

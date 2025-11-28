@@ -65,16 +65,21 @@ export const PropertyRateHistoryModal: React.FC<PropertyRateHistoryModalProps> =
       } else if (response.data) {
         const responseData = response.data as any;
         const ratesArray = responseData.data || (Array.isArray(responseData) ? responseData : []);
+        
+        // Filter to ensure only rates for this specific property are shown
+        const propertyRates = Array.isArray(ratesArray) 
+          ? ratesArray.filter((rate: any) => rate.property_id === property.id)
+          : [];
+        
         // Sort by year descending (newest first), then by created_at
-        const sortedRates = Array.isArray(ratesArray) 
-          ? ratesArray.sort((a: any, b: any) => {
+        const sortedRates = propertyRates.sort((a: any, b: any) => {
               const yearDiff = (b.year || 0) - (a.year || 0);
               if (yearDiff !== 0) return yearDiff;
               const dateA = new Date(a.created_at || 0).getTime();
               const dateB = new Date(b.created_at || 0).getTime();
               return dateB - dateA;
-            })
-          : [];
+        });
+        
         setRates(sortedRates);
       } else {
         setRates([]);
@@ -150,7 +155,6 @@ export const PropertyRateHistoryModal: React.FC<PropertyRateHistoryModalProps> =
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : "Баталгаажуулахад алдаа гарлаа";
       toast.error(errorMsg);
-      console.error("Failed to approve rate:", err);
     } finally {
       setProcessingIds((prev) => {
         const newSet = new Set(prev);
@@ -184,7 +188,6 @@ export const PropertyRateHistoryModal: React.FC<PropertyRateHistoryModalProps> =
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : "Татгалзахад алдаа гарлаа";
       toast.error(errorMsg);
-      console.error("Failed to reject rate:", err);
     } finally {
       setProcessingIds((prev) => {
         const newSet = new Set(prev);

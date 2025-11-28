@@ -18,7 +18,7 @@ interface TenantListProps {
 }
 
 const TenantList: React.FC<TenantListProps> = ({ onTenantClick }) => {
-  const [filterType, setFilterType] = React.useState<FilterType>("renewal");
+  const [filterType, setFilterType] = React.useState<FilterType>("all");
   const [processingIds, setProcessingIds] = useState<Set<number>>(new Set());
   const { leaseRequests, loading, error, statusOptions, currentPage, totalPages, fetchLeaseRequests, handlePageChange } = useLeaseRequests();
   const tenants = useTenantData(leaseRequests);
@@ -49,29 +49,25 @@ const TenantList: React.FC<TenantListProps> = ({ onTenantClick }) => {
   }, [tenants, leaseRequests]);
 
   const filteredTenants = useMemo(() => {
-    if (filterType === "new") {
-      return tenantsWithoutSubmitted.filter((tenant) => {
-        // Exclude tenants with propertyId (talbar sonogdson)
-        if (tenant.propertyId !== null && tenant.propertyId !== undefined) {
-          return false;
-        }
-        return tenant.isNewTenant;
-      });
-    } else if (filterType === "renewal") {
-      return tenantsWithoutSubmitted.filter((tenant) => {
-        return tenant.isRenewal;
-      });
-    } else if (filterType === "rejected") {
-      // For rejected tab, show rejected/cancelled statuses from all tenants (not filtered by tenantsWithoutSubmitted)
+    // If "all" is selected, return all tenants without submitted
+    if (filterType === "all") {
+      return tenantsWithoutSubmitted;
+    }
+    
+    // Filter by specific status
       return tenants.filter((tenant) => {
         const originalRequest = leaseRequests.find((req: any) => req.id === tenant.id);
         if (!originalRequest) return false;
-        const rejectedStatuses = ["rejected", "cancelled", "reject", "cancel", "director_rejected"];
-        return rejectedStatuses.includes(originalRequest.status);
-      });
-    }
-    return tenantsWithoutSubmitted;
-  }, [tenantsWithoutSubmitted, filterType, leaseRequests]);
+      
+      // Exclude approved status from main list (unless specifically filtering for it)
+      if (filterType !== "approved" && originalRequest.status === "approved") {
+        return false;
+      }
+      
+      // Match the selected status
+      return originalRequest.status === filterType;
+    });
+  }, [tenants, filterType, leaseRequests, tenantsWithoutSubmitted]);
 
   const handleStatusChange = async (tenantId: number, newStatus: string) => {
     // TODO: Implement status update API call
@@ -136,7 +132,14 @@ const TenantList: React.FC<TenantListProps> = ({ onTenantClick }) => {
       <TenantHeader />
       {error && !loading && <TenantError error={error} onRetry={fetchLeaseRequests} />}
       {!error && <TenantStatistics tenants={tenantsWithoutSubmitted} loading={loading} />}
-      <TenantFilterTabs filterType={filterType} onFilterChange={setFilterType} tenants={tenantsWithoutSubmitted} leaseRequests={leaseRequests} />
+      <TenantFilterTabs 
+        filterType={filterType} 
+        onFilterChange={setFilterType} 
+        tenants={tenantsWithoutSubmitted} 
+        leaseRequests={leaseRequests}
+        allowedStatuses={["pending", "property_selected"]}
+        showAllTab={true}
+      />
       {!error && (
         <>
           <TenantTable

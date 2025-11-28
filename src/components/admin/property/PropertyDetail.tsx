@@ -1,11 +1,13 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { toast } from "sonner";
 import { ArrowLeft, Star, MapPin, Building, User, Calendar, DollarSign, Package, Tag, FileText, Edit, History } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getProperty, getAnnualRates } from "@/lib/api";
 import { Property } from "./types";
 import { PropertyRateHistoryModal } from "./PropertyRateHistoryModal";
+import { EditPropertyModal } from "./EditPropertyModal";
 
 interface PropertyDetailProps {
   propertyId: number;
@@ -35,6 +37,7 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({
   const [annualRates, setAnnualRates] = useState<any[]>([]);
   const [loadingRates, setLoadingRates] = useState(false);
   const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   const fetchPropertyData = async () => {
     setLoading(true);
@@ -75,9 +78,9 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({
       }
       
       if (response.error) {
-        // Only log non-404 errors
+        // Only show toast for non-404 errors
         if (response.status !== 404) {
-          console.error("Failed to fetch annual rates:", response.error);
+          toast.error(`Үнэлгээний мэдээлэл татахад алдаа гарлаа: ${response.error}`);
         }
         setAnnualRates([]);
       } else if (response.data) {
@@ -96,10 +99,11 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({
         setAnnualRates([]);
       }
     } catch (err) {
-      // Only log if it's not a 404 error
+      // Only show toast if it's not a 404 error
       const error = err as any;
       if (error?.status !== 404) {
-        console.error("Failed to fetch annual rates:", err);
+        const errorMsg = err instanceof Error ? err.message : "Үнэлгээний мэдээлэл татахад алдаа гарлаа";
+        toast.error(errorMsg);
       }
       setAnnualRates([]);
     } finally {
@@ -201,24 +205,21 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({
             <h1 className="text-2xl font-semibold text-slate-900">
               Талбайн дэлгэрэнгүй мэдээлэл - #{property?.number || property?.id || propertyId}
             </h1>
-            <p className="text-sm text-slate-500 mt-1">
-              ID: {property?.id || propertyId}
-            </p>
           </div>
         </div>
         <div className="flex items-center gap-2">
-          {onEdit && property && (
-            <Button variant="outline" onClick={() => onEdit(property)}>
+          {property && (
+            <Button variant="outline" onClick={() => setIsEditModalOpen(true)}>
               <Edit className="h-4 w-4 mr-2" />
               Засах
             </Button>
           )}
-          {onRateClick && property && (
+          {/* {onRateClick && property && (
             <Button variant="outline" onClick={() => onRateClick(property)}>
               <Star className="h-4 w-4 mr-2" />
               Үнэлгээний хүсэлт илгээх
             </Button>
-          )}
+          )} */}
         </div>
       </div>
 
@@ -566,6 +567,21 @@ export const PropertyDetail: React.FC<PropertyDetailProps> = ({
           onClose={() => setIsHistoryModalOpen(false)}
           onApprove={onApproveRate}
           onReject={onRejectRate}
+        />
+      )}
+
+      {/* Edit Property Modal */}
+      {isEditModalOpen && property && (
+        <EditPropertyModal
+          property={property}
+          onClose={() => setIsEditModalOpen(false)}
+          onSuccess={() => {
+            setIsEditModalOpen(false);
+            setRefreshKey((prev) => prev + 1);
+            if (onEdit) {
+              onEdit(property);
+            }
+          }}
         />
       )}
     </div>

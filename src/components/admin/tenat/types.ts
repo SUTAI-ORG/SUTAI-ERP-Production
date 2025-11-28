@@ -14,5 +14,5 @@ export interface Tenant {
   status?: string;
 }
 
-export type FilterType = "new" | "renewal" | "rejected";
+export type FilterType = "pending" | "property_selected" | "checking" | "under_review" | "incomplete" | "rejected" | "cancelled" | "approved" | "in_contract_process" | "all";
 

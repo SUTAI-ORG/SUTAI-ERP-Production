@@ -17,32 +17,41 @@ interface ApprovedTenantListProps {
 }
 
 const ApprovedTenantList: React.FC<ApprovedTenantListProps> = ({ onTenantClick }) => {
-  const [filterType, setFilterType] = React.useState<FilterType>("renewal");
+  const [filterType, setFilterType] = React.useState<FilterType>("approved");
   const [processingIds, setProcessingIds] = useState<Set<number>>(new Set());
   const { leaseRequests, loading, error, statusOptions, currentPage, totalPages, fetchLeaseRequests, handlePageChange } = useLeaseRequests();
   const tenants = useTenantData(leaseRequests);
 
-  // Filter only approved status requests
+  // Filter tenants with statuses that should appear in "Гэрээний бүрдүүлбэр" section
+  // These include: approved, checking, incomplete, under_review
   const approvedTenants = useMemo(() => {
     return tenants.filter((tenant) => {
       // Find the original request to check status
       const originalRequest = leaseRequests.find((req: any) => req.id === tenant.id);
       if (!originalRequest) return false;
       
-      // Only show tenants with "approved" status
-      return originalRequest.status === "approved";
+      // Show tenants with these statuses: approved, checking, incomplete, under_review
+      const allowedStatuses = ["approved", "checking", "incomplete", "under_review"];
+      return allowedStatuses.includes(originalRequest.status);
     });
   }, [tenants, leaseRequests]);
 
-  // Apply filter type (new or renewal)
+  // Apply filter by status
   const filteredTenants = useMemo(() => {
-    if (filterType === "new") {
-      return approvedTenants.filter((tenant) => tenant.isNewTenant);
-    } else if (filterType === "renewal") {
-      return approvedTenants.filter((tenant) => tenant.isRenewal);
+    // If "all" is selected, return all approved tenants
+    if (filterType === "all") {
+      return approvedTenants;
     }
-    return approvedTenants;
-  }, [approvedTenants, filterType]);
+    
+    // Filter by specific status
+    return approvedTenants.filter((tenant) => {
+      const originalRequest = leaseRequests.find((req: any) => req.id === tenant.id);
+      if (!originalRequest) return false;
+      
+      // Match the selected status
+      return originalRequest.status === filterType;
+    });
+  }, [approvedTenants, filterType, leaseRequests]);
 
   const handleStatusChange = async (tenantId: number, newStatus: string) => {
     // TODO: Implement status update API call
@@ -112,7 +121,15 @@ const ApprovedTenantList: React.FC<ApprovedTenantListProps> = ({ onTenantClick }
       </div>
       {error && !loading && <TenantError error={error} onRetry={fetchLeaseRequests} />}
       {!error && <TenantStatistics tenants={approvedTenants} loading={loading} />}
-      <TenantFilterTabs filterType={filterType} onFilterChange={setFilterType} tenants={approvedTenants} showRejected={false} />
+      <TenantFilterTabs 
+        filterType={filterType} 
+        onFilterChange={setFilterType} 
+        tenants={approvedTenants} 
+        leaseRequests={leaseRequests} 
+        showRejected={false}
+        allowedStatuses={["approved", "checking",  "incomplete", "under_review",]}
+        showAllTab={false}
+      />
       {!error && (
         <>
           <TenantTable
@@ -125,6 +142,7 @@ const ApprovedTenantList: React.FC<ApprovedTenantListProps> = ({ onTenantClick }
             onReject={handleReject}
             filterType={filterType}
             processingIds={processingIds}
+            showActions={false}
           />
           {totalPages > 1 && (
             <Pagination

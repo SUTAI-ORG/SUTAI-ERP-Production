@@ -1,32 +1,49 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { Plus, X } from "lucide-react";
+import { Edit, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { createProperty } from "@/lib/api";
+import { updateProperty } from "@/lib/api";
 import { CreatePropertyForm } from "./CreatePropertyForm";
+import { Property } from "./types";
 
-interface CreatePropertyModalProps {
+interface EditPropertyModalProps {
+  property: Property;
   onClose: () => void;
   onSuccess: () => void;
 }
 
-export const CreatePropertyModal: React.FC<CreatePropertyModalProps> = ({
+export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
+  property,
   onClose,
   onSuccess,
 }) => {
   const [formData, setFormData] = useState({
-    number: "",
-    x: null as number | null,
-    y: null as number | null,
-    length: null as number | null,
-    width: null as number | null,
-    block_id: null as number | null,
-    type_id: null as number | null,
-    product_type_id: null as number | null,
+    number: property.number || "",
+    x: property.x ?? null,
+    y: property.y ?? null,
+    length: property.length ?? null,
+    width: property.width ?? null,
+    block_id: property.block_id ?? null,
+    type_id: property.type_id ?? null,
+    product_type_id: property.product_type_id ?? null,
   });
-  const [creating, setCreating] = useState(false);
+  const [updating, setUpdating] = useState(false);
+
+  useEffect(() => {
+    // Update form data when property changes
+    setFormData({
+      number: property.number || "",
+      x: property.x ?? null,
+      y: property.y ?? null,
+      length: property.length ?? null,
+      width: property.width ?? null,
+      block_id: property.block_id ?? null,
+      type_id: property.type_id ?? null,
+      product_type_id: property.product_type_id ?? null,
+    });
+  }, [property]);
 
   const handleFormDataChange = (data: {
     number?: string;
@@ -51,7 +68,7 @@ export const CreatePropertyModal: React.FC<CreatePropertyModalProps> = ({
       return;
     }
 
-    setCreating(true);
+    setUpdating(true);
     try {
       const propertyData: {
         number?: string;
@@ -103,11 +120,11 @@ export const CreatePropertyModal: React.FC<CreatePropertyModalProps> = ({
         propertyData.product_type_id = null;
       }
 
-      const response = await createProperty(propertyData);
+      const response = await updateProperty(property.id, propertyData);
       if (response.error) {
         toast.error(response.error || response.message || "Алдаа гарлаа");
       } else {
-        toast.success("Талбай амжилттай үүсгэгдлээ");
+        toast.success("Талбай амжилттай шинэчлэгдлээ");
         onSuccess();
         onClose();
       }
@@ -115,7 +132,7 @@ export const CreatePropertyModal: React.FC<CreatePropertyModalProps> = ({
       const errorMsg = err instanceof Error ? err.message : "Алдаа гарлаа";
       toast.error(errorMsg);
     } finally {
-      setCreating(false);
+      setUpdating(false);
     }
   };
 
@@ -127,11 +144,11 @@ export const CreatePropertyModal: React.FC<CreatePropertyModalProps> = ({
       <div className="relative z-[101] w-full max-w-4xl mx-4 bg-white rounded-xl shadow-xl border border-slate-200 flex flex-col max-h-[90vh]">
         <div className="flex items-center justify-between p-6 border-b border-slate-200">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center text-white">
-              <Plus className="h-5 w-5" />
+            <div className="h-10 w-10 rounded-full bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center text-white">
+              <Edit className="h-5 w-5" />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-slate-800">Шинэ талбай нэмэх</h2>
+              <h2 className="text-xl font-bold text-slate-800">Талбай засах</h2>
             </div>
           </div>
           <Button variant="ghost" size="sm" onClick={onClose} className="h-8 w-8 p-0">
@@ -142,14 +159,14 @@ export const CreatePropertyModal: React.FC<CreatePropertyModalProps> = ({
         <CreatePropertyForm formData={formData} onFormDataChange={handleFormDataChange} />
         
         <div className="flex items-center justify-end gap-3 p-6 border-t border-slate-200">
-          <Button variant="outline" onClick={onClose} disabled={creating}>
+          <Button variant="outline" onClick={onClose} disabled={updating}>
             Цуцлах
           </Button>
           <Button
             onClick={handleSubmit}
-            disabled={creating || !isFormValid}
+            disabled={updating || !isFormValid}
           >
-            {creating ? "Хадгалж байна..." : "Хадгалах"}
+            {updating ? "Хадгалж байна..." : "Хадгалах"}
           </Button>
         </div>
       </div>

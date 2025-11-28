@@ -7,7 +7,7 @@ import PermissionManagement from "@/components/admin/permission-management/Permi
 import MerchantList from "@/components/admin/merchant/MerchantList";
 import TenantList from "@/components/admin/tenat/TenantList";
 import TenantDetail from "@/components/admin/tenat/TenantDetail";
-import ContractFormDetail from "@/components/admin/tenat/ContractFormDetail";
+import { ContractFormDetail } from "@/components/admin/tenat/contract-tenant";
 import ApprovedTenantList from "@/components/admin/tenat/ApprovedTenantList";
 import ContractProcess from "@/components/admin/tenat/contract-process";
 import InsuranceManagement from "@/components/admin/tenat/insurance-management";

@@ -3,9 +3,18 @@
  * Supports GET, POST, PATCH, PUT, DELETE methods
  */
 
+// Helper function to normalize URL (remove duplicate protocols)
+const normalizeBaseUrl = (url: string): string => {
+  if (!url) return "";
+  // Remove any existing protocol
+  url = url.replace(/^https?:\/\//, "");
+  // Ensure it starts with https://
+  return `https://${url}`;
+};
+
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL 
-  ? `https://${process.env.NEXT_PUBLIC_API_URL}` 
-  : process.env.NEXT_PUBLIC_BASE_URL_TEST || "";
+  ? normalizeBaseUrl(process.env.NEXT_PUBLIC_API_URL)
+  : (process.env.NEXT_PUBLIC_BASE_URL_TEST ? normalizeBaseUrl(process.env.NEXT_PUBLIC_BASE_URL_TEST) : "");
 
 const API_KEY = process.env.NEXT_PUBLIC_API_KEY || "";
 
@@ -563,13 +572,75 @@ export const getLeaseRequestById = async (id: number): Promise<ApiResponse<any>>
 };
 
 /**
+ * Get approved lease request by ID API function
+ * Uses /v1/lease-requests/checking/requests/:id endpoint
+ */
+export const getApprovedLeaseRequestById = async (id: number): Promise<ApiResponse<any>> => {
+  return get(`/v1/lease-requests/checking/requests/${id}`);
+};
+
+/**
+ * Update approved lease request attachments with approve/reject status
+ * Uses /v1/lease-requests/checking/requests/:id endpoint
+ * @param requestId - The lease request ID
+ * @param attachments - Array of attachments with id, name, status (approved/rejected)
+ * @param notes - Optional object mapping attachment IDs to notes (for rejected attachments)
+ */
+export const updateApprovedLeaseRequestAttachments = async (
+  requestId: number,
+  attachments: Array<{
+    name: string;
+    status: "approved" | "rejected";
+    note?: string;
+  }>
+): Promise<ApiResponse<any>> => {
+  // Build request body - only include note if status is rejected
+  const attachmentsForAPI = attachments.map((att) => {
+    const result: any = {
+      name: att.name,
+      status: att.status,
+    };
+
+    // Only add note if status is rejected and note exists
+    if (att.status === "rejected" && att.note) {
+      result.note = att.note;
+    }
+
+    return result;
+  });
+
+  // Log the request body for debugging
+  console.log("API Request Body:", JSON.stringify({
+    attachments: attachmentsForAPI
+  }, null, 2));
+
+  // Validate that all attachments have required fields
+  const invalidAttachments = attachmentsForAPI.filter(att =>
+    !att.name || !att.status
+  );
+
+  if (invalidAttachments.length > 0) {
+    return {
+      status: 400,
+      error: `Invalid attachments in API request: ${JSON.stringify(invalidAttachments)}`
+    };
+  }
+
+  // If only one attachment is being sent, send it directly as the body
+  // Otherwise, send the attachments array wrapped in an object
+  const requestBody = attachmentsForAPI.length === 1 ? attachmentsForAPI[0] : { attachments: attachmentsForAPI };
+
+  return put(`/v1/lease-requests/checking/requests/${requestId}`, requestBody);
+};
+
+/**
  * Update lease request status API function
  */
 export const updateLeaseRequestStatus = async (
   id: number,
   status: string
 ): Promise<ApiResponse<any>> => {
-  return patch(`/v1/lease-requests/${id}`, { status });
+  return put(`/v1/lease-requests/${id}`, { status });
 };
 
 /**
@@ -623,11 +694,11 @@ export const getProperties = async (
     params.orderby = "created_at";
   }
   
-  // Add order parameter (default: asc)
+  // Add order parameter (default: desc)
   if (order !== null && order !== undefined && order.trim() !== "") {
     params.order = order.trim();
   } else {
-    params.order = "asc";
+    params.order = "desc";
   }
   
   // Add relationship parameter

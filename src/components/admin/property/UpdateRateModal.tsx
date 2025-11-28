@@ -2,10 +2,11 @@
 
 import React, { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { X } from "lucide-react";
+import { X, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Property } from "./types";
+import { approveAnnualRate } from "@/lib/api";
 
 interface UpdateRateModalProps {
   property: Property | null;
@@ -37,6 +38,7 @@ export const UpdateRateModal: React.FC<UpdateRateModalProps> = ({
   });
   const [updating, setUpdating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [approving, setApproving] = useState(false);
 
   useEffect(() => {
     if (property?.rate) {
@@ -108,11 +110,41 @@ export const UpdateRateModal: React.FC<UpdateRateModalProps> = ({
       const errorMessage = err instanceof Error ? err.message : "Алдаа гарлаа";
       setError(errorMessage);
       toast.error(errorMessage);
-      console.error("Rate request creation error:", err);
     } finally {
       setUpdating(false);
     }
   };
+
+  const handleApprove = async () => {
+    if (!property?.rate?.id) {
+      toast.error("Үнэлгээний ID олдсонгүй");
+      return;
+    }
+
+    setApproving(true);
+    try {
+      const response = await approveAnnualRate(property.id, property.rate.id);
+      if (response.error) {
+        toast.error(response.error || "Баталгаажуулахад алдаа гарлаа");
+      } else {
+        toast.success("Үнэлгээ амжилттай баталгаажлаа");
+        onSuccess();
+        setTimeout(() => {
+          onClose();
+        }, 100);
+      }
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : "Баталгаажуулахад алдаа гарлаа";
+      toast.error(errorMsg);
+    } finally {
+      setApproving(false);
+    }
+  };
+
+  // Check if rate is pending (not approved)
+  // Button should only show for pending rates (status_id !== 29)
+  // Approved rates (status_id === 29) should not show the approve button
+  const isRatePending = property?.rate?.status_id !== undefined && property.rate.status_id !== 29;
 
   if (!property) return null;
 
@@ -134,11 +166,7 @@ export const UpdateRateModal: React.FC<UpdateRateModalProps> = ({
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
-          {error && (
-            <div className="rounded-lg bg-red-50 border border-red-200 p-4">
-              <p className="text-sm text-red-600">{error}</p>
-            </div>
-          )}
+        
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
@@ -235,11 +263,23 @@ export const UpdateRateModal: React.FC<UpdateRateModalProps> = ({
               type="button"
               variant="outline"
               onClick={onClose}
-              disabled={updating}
+              disabled={updating || approving}
             >
               Цуцлах
             </Button>
-            <Button type="submit" disabled={updating}>
+            {isRatePending && property.rate?.id && (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleApprove}
+                disabled={updating || approving}
+                className="bg-green-50 text-green-700 border-green-200 hover:bg-green-100"
+              >
+                <CheckCircle className="h-4 w-4 mr-2" />
+                {approving ? "Баталгаажуулж байна..." : "Баталгаажуулах"}
+              </Button>
+            )}
+            <Button type="submit" disabled={updating || approving}>
               {updating ? "Илгээж байна..." : "Хүсэлт илгээх"}
             </Button>
           </div>

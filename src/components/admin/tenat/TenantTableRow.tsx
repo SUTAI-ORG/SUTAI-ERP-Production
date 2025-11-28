@@ -12,6 +12,7 @@ interface TenantTableRowProps {
   onApprove?: (tenantId: number) => void;
   onReject?: (tenantId: number) => void;
   isProcessing?: boolean;
+  showActions?: boolean; // Show approve/reject buttons, default true
 }
 
 const getStatusColor = (status: string) => {
@@ -44,7 +45,7 @@ const getStatusColor = (status: string) => {
   }
 };
 
-export const TenantTableRow: React.FC<TenantTableRowProps> = ({ tenant, statusOptions, onTenantClick, onApprove, onReject, isProcessing = false }) => {
+export const TenantTableRow: React.FC<TenantTableRowProps> = ({ tenant, statusOptions, onTenantClick, onApprove, onReject, isProcessing = false, showActions = true }) => {
   // Handle statusOptions that might be an object with {name, style, description} or a simple string
   const getStatusLabel = () => {
     if (!tenant.status) return "-";
@@ -99,12 +100,6 @@ export const TenantTableRow: React.FC<TenantTableRowProps> = ({ tenant, statusOp
         </div>
       </td>
       <td className="px-6 py-4">
-        <div className="flex items-center gap-2">
-          <Mail className="h-4 w-4 text-slate-400" />
-          <span className="text-sm text-slate-600">{tenant.email}</span>
-        </div>
-      </td>
-      <td className="px-6 py-4">
         <span className="text-sm text-slate-600 line-clamp-2">{tenant.description}</span>
       </td>
       <td className="px-6 py-4">
@@ -114,7 +109,7 @@ export const TenantTableRow: React.FC<TenantTableRowProps> = ({ tenant, statusOp
           </span>
         )}
       </td>
-      {hasPropertyId && (
+      {showActions && hasPropertyId && (
         <td className="px-6 py-4">
           <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
             <Button
@@ -138,7 +133,7 @@ export const TenantTableRow: React.FC<TenantTableRowProps> = ({ tenant, statusOp
           </div>
         </td>
       )}
-      {!hasPropertyId && <td className="px-6 py-4"></td>}
+      {(!showActions || !hasPropertyId) && <td className="px-6 py-4"></td>}
     </tr>
   );
 };

@@ -11,8 +11,7 @@ import { TenantTable } from "../TenantTable";
 import { Pagination } from "../../../ui/pagination";
 import { 
   FileText, 
-  Search,
-  Filter
+  Search
 } from "lucide-react";
 import { Input } from "../../../ui/input";
 
@@ -20,11 +19,8 @@ interface ContractProcessProps {
   onTenantClick?: (tenantId: number) => void;
 }
 
-type ProcessStatus = "pending" | "in_progress" | "approved" | "rejected" | "completed";
-
 const ContractProcess: React.FC<ContractProcessProps> = ({ onTenantClick }) => {
-  const [filterType, setFilterType] = useState<FilterType>("renewal");
-  const [statusFilter, setStatusFilter] = useState<ProcessStatus | "all">("all");
+  const [filterType, setFilterType] = useState<FilterType>("in_contract_process");
   const [searchQuery, setSearchQuery] = useState("");
   const [processingIds, setProcessingIds] = useState<Set<number>>(new Set());
   
@@ -41,41 +37,16 @@ const ContractProcess: React.FC<ContractProcessProps> = ({ onTenantClick }) => {
   
   const tenants = useTenantData(leaseRequests);
 
-  // Filter tenants by process status
-  const filteredByStatus = useMemo(() => {
-    if (statusFilter === "all") return tenants;
-    
+  // Filter tenants by status (filterType)
+  const filteredByType = useMemo(() => {
     return tenants.filter((tenant) => {
       const originalRequest = leaseRequests.find((req: any) => req.id === tenant.id);
       if (!originalRequest) return false;
       
-      const status = originalRequest.status?.toLowerCase();
-      switch (statusFilter) {
-        case "pending":
-          return status === "pending" || status === "new";
-        case "in_progress":
-          return status === "in_progress" || status === "processing";
-        case "approved":
-          return status === "approved";
-        case "rejected":
-          return status === "rejected" || status === "declined";
-        case "completed":
-          return status === "completed" || status === "finished";
-        default:
-          return true;
-      }
+      // Match the selected status
+      return originalRequest.status === filterType;
     });
-  }, [tenants, leaseRequests, statusFilter]);
-
-  // Apply filter type (new or renewal)
-  const filteredByType = useMemo(() => {
-    if (filterType === "new") {
-      return filteredByStatus.filter((tenant) => tenant.isNewTenant);
-    } else if (filterType === "renewal") {
-      return filteredByStatus.filter((tenant) => tenant.isRenewal);
-    }
-    return filteredByStatus;
-  }, [filteredByStatus, filterType]);
+  }, [tenants, leaseRequests, filterType]);
 
   // Apply search filter
   const filteredTenants = useMemo(() => {
@@ -106,7 +77,7 @@ const ContractProcess: React.FC<ContractProcessProps> = ({ onTenantClick }) => {
         </div>
       </div>
 
-      {/* Search and Filter Bar */}
+      {/* Search Bar */}
       <div className="flex items-center gap-4">
         <div className="flex-1 relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
@@ -117,21 +88,6 @@ const ContractProcess: React.FC<ContractProcessProps> = ({ onTenantClick }) => {
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-10"
           />
-        </div>
-        <div className="flex items-center gap-2">
-          <Filter className="h-4 w-4 text-slate-500" />
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value as ProcessStatus | "all")}
-            className="px-3 py-2 border border-slate-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="all">Бүх статус</option>
-            <option value="pending">Хүлээгдэж буй</option>
-            <option value="in_progress">Боловсруулж байна</option>
-            <option value="approved">Баталгаажсан</option>
-            <option value="rejected">Татгалзсан</option>
-            <option value="completed">Дууссан</option>
-          </select>
         </div>
       </div>
 
@@ -146,6 +102,9 @@ const ContractProcess: React.FC<ContractProcessProps> = ({ onTenantClick }) => {
         filterType={filterType} 
         onFilterChange={setFilterType} 
         tenants={filteredTenants} 
+        leaseRequests={leaseRequests}
+        allowedStatuses={["in_contract_process","cancelled", "rejected"]}
+        showAllTab={false}
         showRejected={true} 
       />
 
@@ -178,7 +137,7 @@ const ContractProcess: React.FC<ContractProcessProps> = ({ onTenantClick }) => {
           <FileText className="h-12 w-12 text-slate-400 mx-auto mb-4" />
           <h3 className="text-lg font-medium text-slate-800 mb-2">Гэрээний процесс олдсонгүй</h3>
           <p className="text-sm text-slate-500">
-            {searchQuery || statusFilter !== "all"
+            {searchQuery
               ? "Хайлтын үр дүн хоосон байна. Өөр хайлт хийж үзнэ үү."
               : "Одоогоор гэрээний процесс байхгүй байна."}
           </p>
