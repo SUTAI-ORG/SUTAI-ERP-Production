@@ -46,14 +46,19 @@ export const useCreateRole = (showModal: boolean, onSuccess: () => void) => {
         permission_ids: formData.permission_ids,
       });
       if (response.error) {
-        toast.error(response.error);
+        // Show detailed error message
+        const errorMessage = response.error || response.message || "Эрх үүсгэхэд алдаа гарлаа";
+        toast.error(errorMessage);
+        console.error("Create role error:", response);
       } else {
         toast.success("Эрх амжилттай үүсгэгдлээ");
         setFormData({ title: "", permission_ids: [] });
         onSuccess();
       }
-    } catch (err) {
-      toast.error("Алдаа гарлаа");
+    } catch (err: any) {
+      const errorMessage = err?.message || err?.error || "Эрх үүсгэхэд алдаа гарлаа";
+      toast.error(errorMessage);
+      console.error("Create role exception:", err);
     } finally {
       setCreating(false);
     }

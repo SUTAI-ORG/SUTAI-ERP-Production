@@ -1,13 +1,14 @@
 "use client";
 
 import React, { useState, useMemo, useCallback } from "react";
+import { toast } from "sonner";
 import { usePermissionManagement } from "@/hooks/usePermissionManagement";
 import { useCreateRole } from "@/hooks/useCreateRole";
 import { useUpdateRole } from "@/hooks/useUpdateRole";
+import { deleteRole } from "@/lib/api";
 import { PermissionHeader } from "./PermissionHeader";
 import { PermissionStatistics } from "./PermissionStatistics";
 import { PermissionsTable } from "./PermissionsTable";
-import { PermissionPagination } from "./PermissionPagination";
 import { PermissionError } from "./PermissionError";
 import { PermissionsModal } from "./PermissionsModal";
 import { CreateRoleModal } from "./CreateRoleModal";
@@ -81,6 +82,27 @@ const PermissionManagement = () => {
     resetEditForm();
   };
 
+  const handleDeleteRole = useCallback(async (roleId: number) => {
+    const roleName = permissions.find((p) => p.id === roleId)?.name || "Энэ эрх";
+    if (confirm(`${roleName} эрхийг устгахдаа итгэлтэй байна уу?`)) {
+      try {
+        const response = await deleteRole(roleId);
+        if (response.error) {
+          const errorMessage = response.error || response.message || "Эрх устгахад алдаа гарлаа";
+          toast.error(errorMessage);
+          console.error("Delete role error:", response);
+        } else {
+          toast.success("Эрх амжилттай устгагдлаа");
+          fetchPermissions();
+        }
+      } catch (err: any) {
+        const errorMessage = err?.message || err?.error || "Эрх устгахад алдаа гарлаа";
+        toast.error(errorMessage);
+        console.error("Delete role exception:", err);
+      }
+    }
+  }, [permissions, fetchPermissions]);
+
   return (
     <div className="space-y-6">
       <PermissionHeader onAddClick={() => setShowCreateModal(true)} showAddButton={activeTab === "roles"} />
@@ -96,9 +118,9 @@ const PermissionManagement = () => {
               loading={loading}
               onViewPermissions={setSelectedRoleId}
               onEditPermissions={handleEditClick}
+              onDeleteRole={handleDeleteRole}
             />
           )}
-          <PermissionPagination total={permissions.length} />
         </>
       ) : (
         <PermissionsList />

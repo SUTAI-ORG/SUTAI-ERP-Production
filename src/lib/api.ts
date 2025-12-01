@@ -505,7 +505,12 @@ export const createRole = async (roleData: {
   title: string;
   permission_ids: number[];
 }): Promise<ApiResponse<any>> => {
-  return post("/v1/roles", roleData);
+  // API expects 'permissions' field instead of 'permission_ids'
+  const requestData = {
+    title: roleData.title,
+    permissions: roleData.permission_ids,
+  };
+  return post("/v1/roles", requestData);
 };
 
 /**
@@ -518,7 +523,19 @@ export const updateRole = async (
     permission_ids: number[];
   }
 ): Promise<ApiResponse<any>> => {
-  return put(`/v1/roles/${roleId}`, roleData);
+  // API expects 'permissions' field instead of 'permission_ids'
+  const requestData = {
+    title: roleData.title,
+    permissions: roleData.permission_ids,
+  };
+  return put(`/v1/roles/${roleId}`, requestData);
+};
+
+/**
+ * Delete role API function
+ */
+export const deleteRole = async (roleId: number): Promise<ApiResponse<any>> => {
+  return del(`/v1/roles/${roleId}`);
 };
 
 /**
@@ -609,11 +626,6 @@ export const updateApprovedLeaseRequestAttachments = async (
     return result;
   });
 
-  // Log the request body for debugging
-  console.log("API Request Body:", JSON.stringify({
-    attachments: attachmentsForAPI
-  }, null, 2));
-
   // Validate that all attachments have required fields
   const invalidAttachments = attachmentsForAPI.filter(att =>
     !att.name || !att.status
@@ -640,7 +652,7 @@ export const updateLeaseRequestStatus = async (
   id: number,
   status: string
 ): Promise<ApiResponse<any>> => {
-  return put(`/v1/lease-requests/${id}`, { status });
+  return put(`/v1/lease-requests/${id}/approve`, { status });
 };
 
 /**
@@ -649,7 +661,8 @@ export const updateLeaseRequestStatus = async (
  */
 export const approveLeaseRequest = async (id: number): Promise<ApiResponse<any>> => {
   // Use PUT method to approve lease request
-  return put(`/v1/lease-requests/${id}/approve`, {});
+  // Send undefined instead of {} to avoid sending empty body
+  return put(`/v1/lease-requests/${id}/approve`, undefined);
 };
 
 /**
@@ -658,7 +671,8 @@ export const approveLeaseRequest = async (id: number): Promise<ApiResponse<any>>
  */
 export const rejectLeaseRequest = async (id: number): Promise<ApiResponse<any>> => {
   // Use PUT method to reject lease request
-  return put(`/v1/lease-requests/${id}/reject`, {});
+  // Send undefined instead of {} to avoid sending empty body
+  return put(`/v1/lease-requests/${id}/reject`, undefined);
 };
 
 /**
@@ -866,7 +880,8 @@ export const createAnnualRate = async (
  */
 export const approveAnnualRate = async (propertyId: number, rateId: number): Promise<ApiResponse<any>> => {
   // Use PUT method to approve annual rate
-  return put(`/v1/annual-rates/${rateId}/approve`, {});
+  // Send undefined instead of {} to avoid sending empty body
+  return put(`/v1/annual-rates/${rateId}/approve`, undefined);
 };
 
 /**

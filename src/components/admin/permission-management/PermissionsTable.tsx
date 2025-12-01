@@ -11,6 +11,7 @@ interface PermissionsTableProps {
   loading: boolean;
   onViewPermissions: (roleId: number) => void;
   onEditPermissions: (roleId: number) => void;
+  onDeleteRole: (roleId: number) => void;
 }
 
 export const PermissionsTable: React.FC<PermissionsTableProps> = ({
@@ -18,6 +19,7 @@ export const PermissionsTable: React.FC<PermissionsTableProps> = ({
   loading,
   onViewPermissions,
   onEditPermissions,
+  onDeleteRole,
 }) => {
   if (loading) {
     return (
@@ -110,7 +112,13 @@ export const PermissionsTable: React.FC<PermissionsTableProps> = ({
                     >
                       <Edit className="h-4 w-4 text-blue-600" />
                     </Button>
-                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 w-8 p-0"
+                      onClick={() => onDeleteRole(permission.id)}
+                      title="Эрх устгах"
+                    >
                       <Trash2 className="h-4 w-4 text-red-600" />
                     </Button>
                   </div>

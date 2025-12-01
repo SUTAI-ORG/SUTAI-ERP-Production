@@ -70,13 +70,18 @@ export const useUpdateRole = (
         permission_ids: formData.permission_ids,
       });
       if (response.error) {
-        toast.error(response.error);
+        // Show detailed error message
+        const errorMessage = response.error || response.message || "Эрх шинэчлэхэд алдаа гарлаа";
+        toast.error(errorMessage);
+        console.error("Update role error:", response);
       } else {
         toast.success("Эрх амжилттай шинэчлэгдлээ");
         onSuccess();
       }
-    } catch (err) {
-      toast.error("Алдаа гарлаа");
+    } catch (err: any) {
+      const errorMessage = err?.message || err?.error || "Эрх шинэчлэхэд алдаа гарлаа";
+      toast.error(errorMessage);
+      console.error("Update role exception:", err);
     } finally {
       setUpdating(false);
     }

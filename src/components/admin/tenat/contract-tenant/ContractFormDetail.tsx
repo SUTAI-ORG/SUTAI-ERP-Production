@@ -4,6 +4,8 @@ import React from "react";
 import { ContractFormHeader } from "./ContractFormHeader";
 import { ContractFormRequestInfo } from "./ContractFormRequestInfo";
 import { ContractFormLoading } from "./ContractFormLoading";
+import { CheckingStatusActions } from "./CheckingStatusActions";
+import { RecheckingStatusActions } from "./RecheckingStatusActions";
 import { useContractFormData } from "@/hooks/useContractFormData";
 import { getAllUrls } from "./utils/attachmentUtils";
 import { FileText, Download, CheckCircle, XCircle, Clock } from "lucide-react";
@@ -23,6 +25,7 @@ const ContractFormDetail: React.FC<ContractFormDetailProps> = ({
     tenantName,
     requestData,
     attachmentMap,
+    refreshData,
   } = useContractFormData({ tenantId });
   
   const [failedImages, setFailedImages] = React.useState<Set<string>>(new Set());
@@ -73,6 +76,20 @@ const ContractFormDetail: React.FC<ContractFormDetailProps> = ({
       <ContractFormHeader tenantName={tenantName} onBack={onBack} />
       
       {requestData && <ContractFormRequestInfo requestData={requestData} />}
+
+      {/* Status Actions - Show based on request status */}
+      {requestData?.status === "checking" && requestData?.id && (
+        <CheckingStatusActions 
+          requestId={requestData.id} 
+          onStatusUpdate={refreshData}
+        />
+      )}
+      {requestData?.status === "under_review" && requestData?.id && (
+        <RecheckingStatusActions 
+          requestId={requestData.id} 
+          onStatusUpdate={refreshData}
+        />
+      )}
 
       {/* Attachments Section */}
       <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
