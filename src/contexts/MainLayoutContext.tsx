@@ -24,7 +24,7 @@ export function MainLayoutProvider({
 }) {
   const router = useRouter();
   const [activeComponent, setActiveComponent] = useState<string | null>(
-    "user-management"
+    "merchant-list"
   );
 
   // Check authentication on mount

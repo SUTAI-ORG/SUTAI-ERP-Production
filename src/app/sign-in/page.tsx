@@ -4,7 +4,7 @@ import React from "react";
 import { Mail, Lock, Eye, EyeOff, Building2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { login } from "@/lib/api";
+import { login, getAuthUser, getUserById } from "@/lib/api";
 import { useRouter } from "next/navigation";
 
 const SignInPage = () => {
@@ -62,23 +62,26 @@ const SignInPage = () => {
         // Save token to localStorage
         localStorage.setItem("token", token);
         
-        // Save user data if available (includes roles and permissions)
-        const userData = response.data?.user || response.data?.data?.user;
-        if (userData) {
-          localStorage.setItem("user", JSON.stringify(userData));
+        // Fetch current authenticated user (with roles/permissions) using token
+        try {
+          const userResp = await getAuthUser();
+          const authUser = userResp?.data?.data || userResp?.data || null;
+          if (authUser) {
+            localStorage.setItem("user", JSON.stringify(authUser));
+          } else {
+            // No user data returned; keep going
+          }
+        } catch (err) {
+          // Ignore fetch error, user stays unauthenticated
         }
-        
+
         // Redirect to main page
         router.push("/main");
       } else {
-        // Debug: Log full response to help diagnose
-        console.error("Token not found in response:", response);
-        console.error("Response data structure:", JSON.stringify(response.data, null, 2));
         setError("Token хүлээн авсангүй. Response structure: " + JSON.stringify(response.data).substring(0, 300));
       }
     } catch (err) {
       setError("Алдаа гарлаа. Дахин оролдоно уу.");
-      console.error("Login error:", err);
     } finally {
       setIsLoading(false);
     }

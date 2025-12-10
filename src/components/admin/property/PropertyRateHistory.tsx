@@ -232,16 +232,8 @@ export const PropertyRateHistory: React.FC = () => {
 
   if (error) {
     return (
-      <div className="rounded-lg bg-red-50 border border-red-200 p-4">
-        <p className="text-sm text-red-600">{error}</p>
-        <Button
-          onClick={fetchData}
-          variant="outline"
-          size="sm"
-          className="mt-4"
-        >
-          Дахин оролдох
-        </Button>
+      <div className="flex items-center justify-center h-[100%] rounded-lg  p-4">
+        <p className="text-xl text-gray-400">{error}</p>
       </div>
     );
   }

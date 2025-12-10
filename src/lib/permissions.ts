@@ -35,12 +35,14 @@ export const getPermissions = (): string[] => {
   if (typeof window === "undefined") return [];
   
   const userStr = localStorage.getItem("user");
-  if (!userStr) return [];
-  
+  if (!userStr) {
+    return [];
+  }
   try {
-    const user = JSON.parse(userStr);
-    const roles: Role[] = user.roles || [];
-    
+    const raw = JSON.parse(userStr);
+    const user = raw?.data ?? raw; // support { data: user } or plain user
+    const roles: Role[] = Array.isArray(user?.roles) ? user.roles : [];
+
     // Extract all permission titles from all roles
     const permissions = new Set<string>();
     roles.forEach((role) => {
@@ -49,8 +51,20 @@ export const getPermissions = (): string[] => {
       });
     });
     
-    return Array.from(permissions);
-  } catch {
+    const permissionArray = Array.from(permissions);
+    // Debug: show signed-in user summary and permissions
+    if (typeof window !== "undefined") {
+      console.log("[Permissions] Current user:", {
+        id: user?.id,
+        name: user?.name,
+        email: user?.email,
+        roles: roles.map((r) => r.title),
+      });
+      console.log("[Permissions] Permission titles:", permissionArray);
+    }
+    
+    return permissionArray;
+  } catch (error) {
     return [];
   }
 };
@@ -75,25 +89,23 @@ export const getRoles = (): Role[] => {
 /**
  * Check if user has a specific permission
  */
+const norm = (s: string) => s.trim();
+
+const getPermissionSet = (): Set<string> =>
+  new Set(getPermissions().map(norm));
+
 export const hasPermission = (permissionTitle: string): boolean => {
-  const permissions = getPermissions();
-  return permissions.includes(permissionTitle);
+  return getPermissionSet().has(norm(permissionTitle));
 };
 
-/**
- * Check if user has any of the specified permissions
- */
 export const hasAnyPermission = (permissionTitles: string[]): boolean => {
-  const permissions = getPermissions();
-  return permissionTitles.some((title) => permissions.includes(title));
+  const set = getPermissionSet();
+  return permissionTitles.some((t) => set.has(norm(t)));
 };
 
-/**
- * Check if user has all of the specified permissions
- */
 export const hasAllPermissions = (permissionTitles: string[]): boolean => {
-  const permissions = getPermissions();
-  return permissionTitles.every((title) => permissions.includes(title));
+  const set = getPermissionSet();
+  return permissionTitles.every((t) => set.has(norm(t)));
 };
 
 /**

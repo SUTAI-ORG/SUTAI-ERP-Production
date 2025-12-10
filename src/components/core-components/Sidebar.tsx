@@ -6,6 +6,7 @@ import React from "react";
 
 import { NavItem, sidebarSections } from "../../utils/sidebarSections";
 import { Button } from "../ui/button";
+import { hasPermission, hasAnyPermission, hasAllPermissions } from "@/lib/rbac";
 
 interface SidebarProps {
   className?: string;
@@ -43,6 +44,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 }) => {
   const [openSection, setOpenSection] = React.useState<string | null>(null);
   const prevActiveIdRef = React.useRef<string | null>(null);
+  const [permissionsReady, setPermissionsReady] = React.useState(false);
 
   const handleToggle = (title: string) => {
     setOpenSection((prev) => (prev === title ? null : title));
@@ -69,38 +71,89 @@ export const Sidebar: React.FC<SidebarProps> = ({
     }
   }, [activeItemId]);
 
+  React.useEffect(() => {
+    // Ensure permission checks run only on client to avoid hydration mismatch
+    setPermissionsReady(true);
+  }, []);
+
+  if (!permissionsReady) {
+    // Avoid SSR/client mismatch; render nothing until permissions can be read
+    return null;
+  }
+
   return (
     <aside
       className={`flex h-full w-72 flex-col border border-slate-100 bg-white ${className ?? ""}`}
     >
       <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-4 py-4">
-        {sidebarSections.map((section) => {
-          const isSectionOpen = openSection === section.title;
-          return (
-            <div key={section.title} className="space-y-2 ">
-              <SectionHeader
-                title={section.title}
-                icon={section.icon}
-                isOpen={isSectionOpen}
-                onToggle={() => handleToggle(section.title)}
-              />
+        {sidebarSections
+          .filter((section) => {
+            // If section has permission, check it
+            if (section.permission || section.permissions) {
+              if (section.permission) {
+                return hasPermission(section.permission);
+              } else if (section.permissions) {
+                if (section.requireAll) {
+                  return hasAllPermissions(section.permissions);
+                } else {
+                  return hasAnyPermission(section.permissions);
+                }
+              }
+              return false;
+            }
+            // No permission required, show always
+            return true;
+          })
+          .map((section) => {
+            const isSectionOpen = openSection === section.title;
+            return (
+              <div key={section.title} className="space-y-2 ">
+                <SectionHeader
+                  title={section.title}
+                  icon={section.icon}
+                  isOpen={isSectionOpen}
+                  onToggle={() => handleToggle(section.title)}
+                />
               {isSectionOpen && (
                 <nav className="ml-3 border-l border-slate-200 pl-4 ease-in-out">
                   <div className="space-y-1 transition-all duration-300">
-                    {section.items.map((item) => (
-                      <SidebarLink
-                        key={item.id}
-                        item={item}
-                        activeItemId={activeItemId}
-                        onSelect={onSelect}
-                      />
-                    ))}
+                    {section.items.map((item) => {
+                      // Filter items based on permissions
+                      if (item.permission || item.permissions) {
+                        // Check permission synchronously
+                        let hasAccess = false;
+                        if (item.permission) {
+                          hasAccess = hasPermission(item.permission);
+                        } else if (item.permissions) {
+                          if (item.requireAll) {
+                            hasAccess = hasAllPermissions(item.permissions);
+                          } else {
+                            hasAccess = hasAnyPermission(item.permissions);
+                          }
+                        }
+                        
+                        // Only render if user has access
+                        if (!hasAccess) {
+                          return null;
+                        }
+                      }
+                      
+                      // Render the item
+                      return (
+                        <SidebarLink
+                          key={item.id}
+                          item={item}
+                          activeItemId={activeItemId}
+                          onSelect={onSelect}
+                        />
+                      );
+                    })}
                   </div>
                 </nav>
               )}
             </div>
           );
-        })}
+          })}
       </div>
     </aside>
   );
@@ -255,14 +308,37 @@ function SidebarGroup({
       </Button>
       {isOpen && (
         <div className="ml-3 border-l border-slate-200 pl-3">
-          {item.children?.map((child) => (
-            <SidebarLink
-              key={child.id}
-              item={child}
-              activeItemId={activeItemId}
-              onSelect={onSelect}
-            />
-          ))}
+          {item.children?.map((child) => {
+            // Filter children based on permissions
+            if (child.permission || child.permissions) {
+              // Check permission synchronously
+              let hasAccess = false;
+              if (child.permission) {
+                hasAccess = hasPermission(child.permission);
+              } else if (child.permissions) {
+                if (child.requireAll) {
+                  hasAccess = hasAllPermissions(child.permissions);
+                } else {
+                  hasAccess = hasAnyPermission(child.permissions);
+                }
+              }
+              
+              // Only render if user has access
+              if (!hasAccess) {
+                return null;
+              }
+            }
+            
+            // Render the child
+            return (
+              <SidebarLink
+                key={child.id}
+                item={child}
+                activeItemId={activeItemId}
+                onSelect={onSelect}
+              />
+            );
+          })}
         </div>
       )}
     </div>

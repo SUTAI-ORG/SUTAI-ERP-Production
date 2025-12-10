@@ -223,8 +223,8 @@ export const PropertyRateHistoryModal: React.FC<PropertyRateHistoryModalProps> =
 
         <div className="flex-1 overflow-y-auto p-6">
           {error && (
-            <div className="rounded-lg bg-red-50 border border-red-200 p-4 mb-4">
-              <p className="text-sm text-red-600">{error}</p>
+            <div className="flex items-center justify-center h-[100%] rounded-lg  p-4 mb-4">
+              <p className="text-xl text-gray-400">{error}</p>
             </div>
           )}
 

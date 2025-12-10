@@ -94,6 +94,20 @@ const handleResponse = async <T>(response: Response): Promise<ApiResponse<T>> =>
 
 
   if (!response.ok) {
+    if (status === 401) {
+      return {
+        error: "Нэвтрэх шаардлагатай.",
+        message: "Нэвтрэх шаардлагатай.",
+        status,
+      };
+    }
+    if (status === 403) {
+      return {
+        error: "Хандах эрхгүй.",
+        message: "Хандах эрхгүй.",
+        status,
+      };
+    }
     let error = "Алдаа гарлаа";
     let errorData: any = null;
     
@@ -476,6 +490,22 @@ export const getRoles = async (): Promise<ApiResponse<{ data: Array<{ id: number
  */
 export const getUsers = async (): Promise<ApiResponse<{ data: Array<{ id: number; name: string; email: string; phone?: string; roles?: Array<{ id: number; title: string; pivot?: { user_id: number; role_id: number } }> }> }>> => {
   return get("/v1/users");
+};
+
+/**
+ * Get current authenticated user (requires auth token)
+ */
+export const getAuthUser = async (): Promise<ApiResponse<{ data: { id: number; name: string; email: string; phone?: string; roles?: Array<{ id: number; title: string; permissions?: Array<{ id: number; title: string }> }> } }>> => {
+  return get("/v1/auth/user");
+};
+
+/**
+ * Get user by ID API function
+ */
+export const getUserById = async (
+  userId: number
+): Promise<ApiResponse<{ data: { id: number; name: string; email: string; phone?: string; roles?: Array<{ id: number; title: string; permissions?: Array<{ id: number; title: string }> }> } }>> => {
+  return get(`/v1/users/${userId}`);
 };
 
 /**

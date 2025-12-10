@@ -8,8 +8,8 @@ interface PropertyErrorProps {
 
 export const PropertyError: React.FC<PropertyErrorProps> = ({ error }) => {
   return (
-    <div className="rounded-lg bg-red-50 border border-red-200 p-4">
-      <p className="text-sm text-red-600">{error}</p>
+    <div className="flex items-center justify-center  rounded-lg  p-4">
+      <p className="text-xl text-gray-400">{error}</p>
     </div>
   );
 };
