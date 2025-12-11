@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { useMainLayout } from "@/contexts/MainLayoutContext";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import UserManagement from "@/components/admin/user-management/UserManagement";
@@ -16,7 +16,7 @@ import InsuranceManagement from "@/components/admin/tenat/insurance-management";
 import PropertyManagement from "@/components/admin/property/PropertyManagement";
 import { PropertyRateHistory } from "@/components/admin/property/PropertyRateHistory";
 
-const MainPage = () => {
+const MainPageContent = () => {
   const { activeComponent } = useMainLayout();
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -170,6 +170,14 @@ const MainPage = () => {
   };
 
   return <>{renderComponent()}</>;
+};
+
+const MainPage = () => {
+  return (
+    <Suspense fallback={<div className="p-4 text-sm text-slate-600">Ачаалж байна...</div>}>
+      <MainPageContent />
+    </Suspense>
+  );
 };
 
 export default MainPage;
