@@ -141,10 +141,36 @@ export const UpdateRateModal: React.FC<UpdateRateModalProps> = ({
     }
   };
 
+  const getStatusCode = (statusId?: number | string | null) => {
+    if (statusId === null || statusId === undefined) return null;
+    return typeof statusId === "string" ? parseInt(statusId, 10) : statusId;
+  };
+
+  const getStatusKey = (status?: any) => {
+    const rawKey = (status?.key || "").toString().toLowerCase();
+    if (rawKey) return rawKey;
+    const text = (status?.label || status?.name || status?.description || "").toString().toLowerCase();
+    if (text.includes("ноорог")) return "draft";
+    if (text.includes("хүлээгдэж")) return "pending";
+    if (text.includes("батлагдсан")) return "approved";
+    if (text.includes("ашиглагдаж")) return "active";
+    if (text.includes("дууссан")) return "expired";
+    if (text.includes("цуцлагд")) return "cancelled";
+    return "";
+  };
+
+  const isApproved = (statusId?: number | string | null, status?: any) => {
+    const code = getStatusCode(statusId);
+    if (code === 29) return true;
+    const key = getStatusKey(status);
+    return key === "approved" || key === "active";
+  };
   // Check if rate is pending (not approved)
   // Button should only show for pending rates (status_id !== 29)
   // Approved rates (status_id === 29) should not show the approve button
-  const isRatePending = property?.rate?.status_id !== undefined && property.rate.status_id !== 29;
+  const isRatePending = (() =>
+    !isApproved(property?.rate?.status_id, (property as any)?.rate?.status)
+  )();
 
   if (!property) return null;
 
@@ -166,8 +192,6 @@ export const UpdateRateModal: React.FC<UpdateRateModalProps> = ({
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
-        
-
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-2">
@@ -208,7 +232,7 @@ export const UpdateRateModal: React.FC<UpdateRateModalProps> = ({
 
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-2">
-                Төлбөр (₮)
+                Менежментийн төлбөр (₮)
               </label>
               <Input
                 type="number"

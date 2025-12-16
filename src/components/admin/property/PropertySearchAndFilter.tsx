@@ -24,8 +24,6 @@ const PropertySearchAndFilter: React.FC<PropertySearchAndFilterProps> = ({
   blocks,
   selectedBlockId,
   onBlockChange,
-  selectedTypeId,
-  onTypeChange,
   selectedProductTypeId,
   onProductTypeChange,
   productTypes,
@@ -46,7 +44,6 @@ const PropertySearchAndFilter: React.FC<PropertySearchAndFilterProps> = ({
             />
           </div>
         </div>
-
         {/* Block Filter */}
         <div className="md:w-56">
           <div className="relative">

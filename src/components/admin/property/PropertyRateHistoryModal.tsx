@@ -22,10 +22,29 @@ interface RateHistoryItem {
   start_date?: string;
   end_date?: string;
   status_id?: number;
+  status?: {
+    id?: number | string;
+    name?: string;
+    description?: string;
+    style?: string;
+  } | null;
   created_at?: string;
   updated_at?: string;
   approved_by_id?: number;
 }
+
+const getStatusKey = (status?: any) => {
+  const rawKey = (status?.key || "").toString().toLowerCase();
+  if (rawKey) return rawKey;
+  const text = (status?.label || status?.name || status?.description || "").toString().toLowerCase();
+  if (text.includes("ноорог")) return "draft";
+  if (text.includes("хүлээгдэж")) return "pending";
+  if (text.includes("батлагдсан")) return "approved";
+  if (text.includes("ашиглагдаж")) return "active";
+  if (text.includes("дууссан")) return "expired";
+  if (text.includes("цуцлагд")) return "cancelled";
+  return "";
+};
 
 export const PropertyRateHistoryModal: React.FC<PropertyRateHistoryModalProps> = ({
   property,
@@ -327,7 +346,14 @@ export const PropertyRateHistoryModal: React.FC<PropertyRateHistoryModalProps> =
                   )}
 
                   {/* Action buttons for pending rates */}
-                  {rate.status_id && rate.status_id !== 29 && onApprove && onReject && (
+                  {(() => {
+                    const rawCode = rate.status_id ?? rate.status?.id;
+                    const code = typeof rawCode === "string" ? parseInt(rawCode, 10) : rawCode;
+                    const key = getStatusKey(rate.status);
+                    const approved = code === 29 || key === "approved" || key === "active";
+                    const terminal = key === "expired" || key === "cancelled";
+                    return !approved && !terminal && onApprove && onReject;
+                  })() && (
                     <div className="pt-4 border-t border-slate-200 mt-4">
                       <div className="flex items-center justify-end gap-2">
                         <Button

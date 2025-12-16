@@ -172,34 +172,80 @@ export const PropertyRateHistory: React.FC = () => {
     return `${amount.toLocaleString()}₮`;
   };
 
+  const getStatusCode = (statusId?: number | string, status?: any) => {
+    const raw = statusId ?? status?.id;
+    if (raw === null || raw === undefined) return null;
+    return typeof raw === "string" ? parseInt(raw, 10) : raw;
+  };
+
+  const getStatusKey = (status?: any) => {
+    const rawKey = (status?.key || "").toString().toLowerCase();
+    if (rawKey) return rawKey;
+    const text = (status?.label || status?.name || status?.description || "").toString().toLowerCase();
+    if (text.includes("ноорог")) return "draft";
+    if (text.includes("хүлээгдэж")) return "pending";
+    if (text.includes("батлагдсан")) return "approved";
+    if (text.includes("ашиглагдаж")) return "active";
+    if (text.includes("дууссан")) return "expired";
+    if (text.includes("цуцлагд")) return "cancelled";
+    return "";
+  };
+
+  const isApproved = (statusId?: number | string, status?: any) => {
+    const code = getStatusCode(statusId, status);
+    if (code === 29) return true;
+    const key = getStatusKey(status);
+    return key === "approved" || key === "active";
+  };
+
+  const canApprove = (rate: RateHistoryItem) => {
+    const code = getStatusCode(rate.status_id, rate.status);
+    const key = getStatusKey(rate.status);
+    if (code === 29) return false;
+    if (key === "approved" || key === "active" || key === "expired" || key === "cancelled") return false;
+    return true; // draft/pending/unknown
+  };
+
   const getStatusBadge = (statusId?: number, status?: any) => {
+    const effectiveStatusId = getStatusCode(statusId, status);
+    const key = getStatusKey(status);
+
+    const palette: Record<string, { bg: string; text: string; icon: "check" | "clock" }> = {
+      draft: { bg: "bg-slate-200", text: "text-slate-800", icon: "clock" },
+      pending: { bg: "bg-amber-100", text: "text-amber-700", icon: "clock" },
+      approved: { bg: "bg-cyan-100", text: "text-cyan-700", icon: "check" },
+      active: { bg: "bg-emerald-100", text: "text-emerald-700", icon: "check" },
+      expired: { bg: "bg-gray-200", text: "text-gray-700", icon: "clock" },
+      cancelled: { bg: "bg-yellow-100", text: "text-yellow-800", icon: "clock" },
+    };
+
     // Use status object from API if available
     if (status && status.description) {
-      const statusStyle = status.style || '';
+      const statusStyle = status.style || "";
       // Parse style classes from backend (e.g., "bg-success text-white")
-      let bgColor = 'bg-slate-100';
-      let textColor = 'text-slate-700';
+      let bgColor = "bg-slate-100";
+      let textColor = "text-slate-700";
       
-      if (statusStyle.includes('bg-success')) {
-        bgColor = 'bg-green-100';
-        textColor = 'text-green-700';
-      } else if (statusStyle.includes('bg-warning')) {
-        bgColor = 'bg-yellow-100';
-        textColor = 'text-yellow-700';
+      if (statusStyle.includes("bg-success")) {
+        bgColor = "bg-green-100";
+        textColor = "text-green-700";
+      } else if (statusStyle.includes("bg-warning")) {
+        bgColor = "bg-yellow-100";
+        textColor = "text-yellow-700";
       }
       
+      const paletteMatch = palette[key] || (effectiveStatusId === 29 ? palette.approved : palette.pending);
+      const icon = paletteMatch.icon === "check" ? <CheckCircle className="h-3 w-3" /> : <Clock className="h-3 w-3" />;
       return (
-        <span className={`inline-flex items-center gap-1 px-2 py-1 text-xs font-medium ${bgColor} ${textColor} rounded-full`}>
-          {statusId === 29 ? <CheckCircle className="h-3 w-3" /> : <Clock className="h-3 w-3" />}
+        <span className={`inline-flex items-center gap-1 px-2 py-1 text-xs font-medium ${paletteMatch.bg} ${paletteMatch.text} rounded-full`}>
+          {icon}
           {status.description}
         </span>
       );
     }
     
     // Fallback to status_id check
-    if (!statusId) return null;
-    
-    if (statusId === 29) {
+    if (effectiveStatusId === 29) {
       return (
         <span className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium text-green-700 bg-green-100 rounded-full">
           <CheckCircle className="h-3 w-3" />
@@ -310,7 +356,7 @@ export const PropertyRateHistory: React.FC = () => {
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center justify-end gap-2">
-                        {rate.status_id && rate.status_id !== 29 && (
+                        {canApprove(rate) && (
                           <Button
                             variant="outline"
                             size="sm"

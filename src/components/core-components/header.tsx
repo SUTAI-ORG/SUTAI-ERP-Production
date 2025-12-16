@@ -52,13 +52,12 @@ const Header: React.FC = () => {
     // Remove token and user data from localStorage
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-    
     // Redirect to sign-in page
     router.push("/sign-in");
   };
 
   return (
-    <header className="sticky top-0 z-50 flex items-center justify-between gap-6 border-b border-slate-200 bg-white px-8 py-5">
+    <header className="sticky top-0 z-50 flex items-center justify-between gap-6 border-b border-slate-200 bg-white px-8">
       <div className="flex items-center gap-3 rounded-2xl mr-auto  py-2">
       <div className="flex justify-center">
         <Image

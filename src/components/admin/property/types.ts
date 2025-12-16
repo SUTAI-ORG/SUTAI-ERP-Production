@@ -90,6 +90,12 @@ export interface Property {
     property_id?: number;
     approved_by_id?: number;
     status_id?: number;
+    status?: {
+      id?: number;
+      name?: string;
+      description?: string;
+      style?: string;
+    };
   };
 }
 

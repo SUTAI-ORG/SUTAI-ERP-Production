@@ -91,7 +91,6 @@ const PropertyManagement: React.FC = () => {
         onExportExcel={handleExportExcel}
         onAddClick={handleAdd}
       />
-
       <>
           <PropertyStatistics
             totalItems={totalItems || properties.length}
