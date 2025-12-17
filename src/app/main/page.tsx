@@ -198,12 +198,16 @@ const MainPageContent = () => {
     }
   };
 
-  return <>{renderComponent()}</>;
+  return (
+    <div className="min-h-screen bg-slate-50">
+      {renderComponent()}
+    </div>
+  );
 };
 
 const MainPage = () => {
   return (
-    <Suspense fallback={<div className="p-4 text-sm text-slate-600">Ачаалж байна...</div>}>
+    <Suspense fallback={<div className="min-h-screen bg-slate-50 p-4 text-sm text-slate-600">Ачаалж байна...</div>}>
       <MainPageContent />
     </Suspense>
   );

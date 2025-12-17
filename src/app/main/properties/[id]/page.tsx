@@ -14,6 +14,7 @@ export default function PropertyDetailPage() {
   const propertyId = params?.id ? parseInt(params.id as string) : null;
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
   const [isRateModalOpen, setIsRateModalOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const handleBack = () => {
     router.push("/main");
@@ -39,6 +40,7 @@ export default function PropertyDetailPage() {
         }
       }
     }
+    setLoading(false);
   };
 
   const handleRejectRate = async (propertyId: number, rateId: number) => {
@@ -110,7 +112,7 @@ export default function PropertyDetailPage() {
 
   if (!propertyId || isNaN(propertyId)) {
     return (
-      <div className="flex items-center justify-center py-12">
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center py-12">
         <div className="text-center">
           <p className="text-sm text-red-600">Талбайн ID буруу байна</p>
           <button
@@ -125,16 +127,30 @@ export default function PropertyDetailPage() {
   }
 
   return (
-    <>
-      <PropertyDetail
-        propertyId={propertyId}
-        property={selectedProperty}
-        onBack={handleBack}
-        onRateClick={handleRateClick}
-        onRateSuccess={handleRateSuccess}
-        onApproveRate={handleApproveRate}
-        onRejectRate={handleRejectRate}
-      />
+    <div className="min-h-screen bg-slate-50">
+      <div className="max-w-6xl mx-auto px-4 py-6">
+        {loading ? (
+          <div className="animate-pulse space-y-4">
+            <div className="h-10 bg-slate-200 rounded-lg" />
+            <div className="h-64 bg-slate-200 rounded-lg" />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {[1,2,3,4].map((i) => (
+                <div key={i} className="h-24 bg-slate-200 rounded-lg" />
+              ))}
+            </div>
+          </div>
+        ) : (
+          <PropertyDetail
+            propertyId={propertyId}
+            property={selectedProperty}
+            onBack={handleBack}
+            onRateClick={handleRateClick}
+            onRateSuccess={handleRateSuccess}
+            onApproveRate={handleApproveRate}
+            onRejectRate={handleRejectRate}
+          />
+        )}
+      </div>
       
       {/* Rate Update Modal */}
       {isRateModalOpen && selectedProperty && (
@@ -148,7 +164,7 @@ export default function PropertyDetailPage() {
           onUpdateRate={handleUpdateRate}
         />
       )}
-    </>
+    </div>
   );
 }
 
