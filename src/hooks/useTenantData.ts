@@ -1,12 +1,16 @@
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 import { getProductTypes, getProperties } from "@/lib/api";
 import { Tenant } from "@/components/admin/tenat/types";
 
 export const useTenantData = (leaseRequests: any[]) => {
   const [productTypes, setProductTypes] = useState<Record<number, string>>({});
   const [properties, setProperties] = useState<Record<number, string>>({});
+  const loadedOnce = useRef(false);
 
   useEffect(() => {
+    if (loadedOnce.current) return;
+    loadedOnce.current = true;
+    
     getProductTypes()
       .then((response) => {
         if (response.data?.data) {

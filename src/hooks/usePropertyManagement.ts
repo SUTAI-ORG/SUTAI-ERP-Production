@@ -118,7 +118,12 @@ export const usePropertyManagement = () => {
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
+  const initialLoaded = useRef(false);
+
   useEffect(() => {
+    if (initialLoaded.current) return;
+    initialLoaded.current = true;
+
     fetchProductTypes();
     fetchBlocks();
     fetchProperties(1, null, null, null);

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { NavItem } from "@/utils/sidebarSections";
 
 type NavItemType = NavItem;
@@ -23,6 +23,8 @@ export function MainLayoutProvider({
   children: React.ReactNode;
 }) {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
   const [activeComponent, setActiveComponent] = useState<string | null>(
     "merchant-list"
   );
@@ -35,11 +37,25 @@ export function MainLayoutProvider({
     }
   }, [router]);
 
+  // Sync active component from query (?view=componentKey)
+  useEffect(() => {
+    const view = searchParams.get("view");
+    if (view && view !== activeComponent) {
+      setActiveComponent(view);
+    }
+  }, [searchParams, activeComponent]);
+
+
   const handleSidebarSelect = (item: NavItemType) => {
     if (item.href) {
       router.push(item.href);
     } else if (item.componentKey) {
+      // Update state and URL query so browser back works as tabs history
       setActiveComponent(item.componentKey);
+      const params = new URLSearchParams(searchParams.toString());
+      params.set("view", item.componentKey);
+      const next = params.toString();
+      router.push(next ? `${pathname}?${next}` : pathname, { scroll: false });
     }
   };
 

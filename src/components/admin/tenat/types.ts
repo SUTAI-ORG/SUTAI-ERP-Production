@@ -15,4 +15,3 @@ export interface Tenant {
 }
 
 export type FilterType = "pending" | "property_selected" | "checking" | "under_review" | "incomplete" | "rejected" | "cancelled" | "approved" | "in_contract_process" | "all";
-

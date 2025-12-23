@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { getLeaseRequests } from "@/lib/api";
 
 export interface LeaseRequest {
@@ -18,6 +18,7 @@ export const useLeaseRequests = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
+  const hasFetchedInitially = useRef(false);
 
   const fetchLeaseRequests = async (page: number = currentPage) => {
     try {
@@ -86,6 +87,8 @@ export const useLeaseRequests = () => {
   };
 
   useEffect(() => {
+    if (hasFetchedInitially.current) return;
+    hasFetchedInitially.current = true;
     fetchLeaseRequests(1);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
