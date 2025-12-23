@@ -67,11 +67,8 @@ export default function PropertyDetailPage() {
   };
 
   const handleUpdateRate = async (propertyId: number, rateData: {
-    year: number;
     rate: number;
     fee: number;
-    start_date: string;
-    end_date: string;
   }) => {
     const property = selectedProperty;
     const productTypeId = property?.product_type_id ?? property?.product_type?.id ?? null;
@@ -82,11 +79,11 @@ export default function PropertyDetailPage() {
     
     const response = await createAnnualRate({
       property_id: propertyId,
-      year: rateData.year,
+      year: new Date().getFullYear(),
       rate: rateData.rate,
       fee: rateData.fee,
-      start_date: rateData.start_date,
-      end_date: rateData.end_date,
+      start_date: "",
+      end_date: "",
       product_type_id: productTypeId,
     });
     

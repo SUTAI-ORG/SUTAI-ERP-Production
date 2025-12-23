@@ -141,7 +141,6 @@ const ApprovedTenantList: React.FC<ApprovedTenantListProps> = ({ onTenantClick }
             onReject={handleReject}
             filterType={filterType}
             processingIds={processingIds}
-            showActions={true}
           />
           {totalPages > 1 && (
             <Pagination

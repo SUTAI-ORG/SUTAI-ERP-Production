@@ -16,11 +16,8 @@ interface UpdateRateModalProps {
 }
 
 interface RateData {
-  year: number;
   rate: number;
   fee: number;
-  start_date: string;
-  end_date: string;
 }
 
 export const UpdateRateModal: React.FC<UpdateRateModalProps> = ({
@@ -30,11 +27,8 @@ export const UpdateRateModal: React.FC<UpdateRateModalProps> = ({
   onUpdateRate,
 }) => {
   const [formData, setFormData] = useState<RateData>({
-    year: new Date().getFullYear(),
     rate: 0,
     fee: 0,
-    start_date: "",
-    end_date: "",
   });
   const [updating, setUpdating] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -49,25 +43,15 @@ export const UpdateRateModal: React.FC<UpdateRateModalProps> = ({
     if (property?.rate) {
       const rate = property.rate.rate || 0;
       setFormData({
-        year: property.rate.year || new Date().getFullYear(),
         rate,
         fee: property.rate.fee ?? computeFee(rate),
-        start_date: property.rate.start_date
-          ? property.rate.start_date.split(" ")[0]
-          : "",
-        end_date: property.rate.end_date
-          ? property.rate.end_date.split(" ")[0]
-          : "",
       });
     } else {
       // Default values for new rate
       const currentYear = new Date().getFullYear();
       setFormData({
-        year: currentYear,
         rate: 0,
         fee: 0,
-        start_date: `${currentYear}-01-01`,
-        end_date: `${currentYear}-12-31`,
       });
     }
   }, [property]);
@@ -83,30 +67,17 @@ export const UpdateRateModal: React.FC<UpdateRateModalProps> = ({
       return;
     }
 
-    if (!formData.start_date || !formData.end_date) {
-      setError("Эхлэх болон дуусах огноо оруулна уу");
-      return;
-    }
-
-    if (new Date(formData.start_date) > new Date(formData.end_date)) {
-      setError("Эхлэх огноо дуусах огнооноос хойш байх ёсгүй");
-      return;
-    }
-
     setUpdating(true);
     try {
       // Ensure all required fields are properly formatted
       const fee = computeFee(formData.rate);
       const rateDataToSend = {
-        year: formData.year,
         rate: Number(formData.rate),
         fee,
-        start_date: formData.start_date,
-        end_date: formData.end_date,
       };
       
       await onUpdateRate(property.id, rateDataToSend);
-      toast.success("Үнэлгээ амжилттай шинэчлэгдлээ");
+      toast.success("Үнэлгээ амжилттай илгээгдлээы");
       // Call onSuccess before closing to ensure data is refreshed
       onSuccess();
       // Small delay to ensure the refresh happens before closing
@@ -200,7 +171,7 @@ export const UpdateRateModal: React.FC<UpdateRateModalProps> = ({
 
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
+            {/* <div>
               <label className="block text-sm font-medium text-slate-700 mb-2">
                 Он
               </label>
@@ -214,7 +185,7 @@ export const UpdateRateModal: React.FC<UpdateRateModalProps> = ({
                 placeholder="Жишээ: 2025"
                 required
               />
-            </div>
+            </div> */}
 
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-2">
@@ -246,9 +217,9 @@ export const UpdateRateModal: React.FC<UpdateRateModalProps> = ({
               <Input
                 type="number"
                 value={formData.fee || ""}
-                readOnly
                 tabIndex={-1}
                 className="w-full"
+                readOnly
                 disabled={true}
                 placeholder="Жишээ: 120000"
                 required
@@ -257,7 +228,7 @@ export const UpdateRateModal: React.FC<UpdateRateModalProps> = ({
               />
             </div>
 
-            <div>
+            {/* <div>
               <label className="block text-sm font-medium text-slate-700 mb-2">
                 Эхлэх огноо
               </label>
@@ -285,7 +256,7 @@ export const UpdateRateModal: React.FC<UpdateRateModalProps> = ({
                 className="w-full"
                 required
               />
-            </div>
+            </div> */}
           </div>
 
           <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-200">

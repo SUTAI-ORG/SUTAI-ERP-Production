@@ -229,11 +229,8 @@ export const usePropertyManagement = () => {
   };
 
   const handleUpdateRate = async (propertyId: number, rateData: {
-    year: number;
     rate: number;
     fee: number;
-    start_date: string;
-    end_date: string;
   }) => {
     const property = properties.find((p) => p.id === propertyId);
     const productTypeId = property?.product_type_id ?? property?.product_type?.id ?? null;
@@ -242,8 +239,14 @@ export const usePropertyManagement = () => {
       throw new Error("Талбай олдсонгүй");
     }
     
-    const response = await updatePropertyRate(propertyId, rateData, productTypeId);
-    
+    const response = await updatePropertyRate(propertyId, {
+      year: new Date().getFullYear(),
+      rate: rateData.rate,
+      fee: rateData.fee,
+      start_date: "",
+      end_date: "",
+    }, productTypeId);
+      
     if (response.error || !response.data) {
       const errorMessage = response.message || response.error || `Алдаа гарлаа (Status: ${response.status || 'unknown'})`;
       toast.error(errorMessage);

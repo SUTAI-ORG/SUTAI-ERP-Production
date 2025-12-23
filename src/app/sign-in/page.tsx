@@ -104,7 +104,7 @@ const SignInPage = () => {
           <div className="flex justify-center py-6">
         <Image
           src="/Sutailogo.jpg"
-          alt="Сутайн буяант лого"
+          alt="Сутайн буянт лого"
           width={160}
           height={160}
           priority
@@ -113,10 +113,10 @@ const SignInPage = () => {
       </div>
           </div>
           <h1 className="text-3xl font-bold text-slate-800 mb-2">
-            Сутайн буяант
+            Сутайн буянт
           </h1>
           <p className="text-slate-500">
-            Энэ систем нь Сутайн буяант захын дотоод систем юм.
+            Энэ систем нь Сутайн буянт захын дотоод систем юм.
           </p>
         </div>
 

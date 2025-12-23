@@ -12,11 +12,18 @@ const normalizeBaseUrl = (url: string): string => {
   return `https://${url}`;
 };
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL 
-  ? normalizeBaseUrl(process.env.NEXT_PUBLIC_API_URL)
-  : (process.env.NEXT_PUBLIC_BASE_URL_TEST ? normalizeBaseUrl(process.env.NEXT_PUBLIC_BASE_URL_TEST) : "");
+const rawBaseUrl =
+  process.env.NEXT_PUBLIC_API_URL ||
+  process.env.NEXT_PUBLIC_PRODUCTION_URL ||
+  process.env.NEXT_PUBLIC_BASE_URL_TEST ||
+  "";
 
-const API_KEY = process.env.NEXT_PUBLIC_API_KEY || "";
+const BASE_URL = rawBaseUrl ? normalizeBaseUrl(rawBaseUrl) : "";
+
+const API_KEY =
+  process.env.NEXT_PUBLIC_API_KEY ||
+  process.env.NEXT_PUBLIC_PRODUCTION_KEY ||
+  "";
 
 export interface ApiResponse<T = any> {
   data?: T;

@@ -211,7 +211,6 @@ const ContractFormDetail: React.FC<ContractFormDetailProps> = ({
                       onClick={() =>
                         handleApproveAttachment(group.name)
                       }
-                      
                       disabled={processingAttachments.has(group.name)}
                     >
                       <CheckCircle className="h-4 w-4 mr-1 " />
@@ -221,7 +220,6 @@ const ContractFormDetail: React.FC<ContractFormDetailProps> = ({
                       size="sm"
                       variant="outline"
                       className="h-8 bg-white text-red-700 border-red-200 hover:bg-red-100 disabled:opacity-50"
-
                       onClick={() =>
                         handleRejectAttachment(group.name)
                       }

@@ -62,7 +62,7 @@ const Header: React.FC = () => {
       <div className="flex justify-center">
         <Image
           src="/Sutailogo.jpg"
-          alt="Сутайн буяант лого"
+          alt="Сутайн буянт лого"
           width={150}
           height={150}
           priority
