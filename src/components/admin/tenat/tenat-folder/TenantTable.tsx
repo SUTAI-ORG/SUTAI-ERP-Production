@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Tenant, FilterType } from "./types";
+import { Tenant, FilterType } from "../types";
 import { TenantTableRow } from "./TenantTableRow";
 
 interface TenantTableProps {

@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { FilterType, Tenant } from "./types";
+import { FilterType, Tenant } from "../types";
 
 interface TenantFilterTabsProps {
   filterType: FilterType;

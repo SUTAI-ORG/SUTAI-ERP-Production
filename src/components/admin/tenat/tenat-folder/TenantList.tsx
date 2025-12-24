@@ -6,13 +6,13 @@ import { toast } from "sonner";
 import { useLeaseRequests } from "@/hooks/useLeaseRequests";
 import { useTenantData } from "@/hooks/useTenantData";
 import { approveLeaseRequest, rejectLeaseRequest } from "@/lib/api";
-import { FilterType } from "./types";
+import { FilterType } from "../types";
 import { TenantHeader } from "./TenantHeader";
 import { TenantError } from "./TenantError";
 // import { TenantStatistics } from "./TenantStatistics";
 import { TenantFilterTabs } from "./TenantFilterTabs";
 import { TenantTable } from "./TenantTable";
-import { Pagination } from "../../ui/pagination";
+import { Pagination } from "../../../ui/pagination";
 
 interface TenantListProps {
   onTenantClick?: (tenantId: number) => void;

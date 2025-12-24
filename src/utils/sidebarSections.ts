@@ -136,6 +136,11 @@ export const sidebarSections: NavSection[] = [
     permission: "other_menu_show",
     items: [
       {
+        id: "other-terms",
+        label: "Үйлчилгээний нөхцөл",
+        componentKey: "legal-documents",
+      },
+      {
         id: "other-settings",
         label: "Системийн тохиргоо",
         href: "#other-settings",
@@ -145,11 +150,6 @@ export const sidebarSections: NavSection[] = [
         id: "other-help",
         label: "Тусламж",
         href: "#other-help",
-      },
-      {
-        id: "other-about",
-        label: "Системийн тухай",
-        href: "#other-about",
       },
     ],
   },

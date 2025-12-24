@@ -4,10 +4,10 @@ import React, { useMemo, useState } from "react";
 import { useLeaseRequests } from "@/hooks/useLeaseRequests";
 import { useTenantData } from "@/hooks/useTenantData";
 import { FilterType } from "../types";
-import { TenantError } from "../TenantError";
+import { TenantError } from "../tenat-folder/TenantError";
 // import { TenantStatistics } from "../TenantStatistics";
-import { TenantFilterTabs } from "../TenantFilterTabs";
-import { TenantTable } from "../TenantTable";
+import { TenantFilterTabs } from "../tenat-folder/TenantFilterTabs";
+import { TenantTable } from "../tenat-folder/TenantTable";
 import { Pagination } from "../../../ui/pagination";
 import { 
   FileText, 

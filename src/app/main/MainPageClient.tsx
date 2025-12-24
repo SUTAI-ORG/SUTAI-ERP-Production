@@ -7,15 +7,16 @@ import UserManagement from "@/components/admin/user-management/UserManagement";
 import PermissionManagement from "@/components/admin/permission-management/PermissionManagement";
 import MerchantList from "@/components/admin/merchant/MerchantList";
 import MerchantDetail from "@/components/admin/merchant/MerchantDetail";
-import TenantList from "@/components/admin/tenat/TenantList";
-import TenantDetail from "@/components/admin/tenat/TenantDetail";
+import TenantList from "@/components/admin/tenat/tenat-folder/TenantList";
+import TenantDetail from "@/components/admin/tenat/tenat-folder/TenantDetail";
 import { ContractFormDetail } from "@/components/admin/tenat/contract-tenant";
-import ApprovedTenantList from "@/components/admin/tenat/ApprovedTenantList";
+import ApprovedTenantList from "@/components/admin/tenat/tenat-folder/ApprovedTenantList";
 import ContractProcess from "@/components/admin/tenat/contract-process";
 import InsuranceManagement from "@/components/admin/tenat/insurance-management";
 import PropertyManagement from "@/components/admin/property/PropertyManagement";
 import { PropertyRateHistory } from "@/components/admin/property/PropertyRateHistory";
 import PropertyRateUpdate from "@/components/admin/property/PropertyRateUpdate";
+import LegalDocuments from "@/components/admin/other/LegalDocuments";
 
 const MainPageClient = () => {
   const { activeComponent } = useMainLayout();
@@ -196,6 +197,8 @@ const MainPageClient = () => {
         return <PropertyRateHistory hideActions />;
       case "property-rate-update":
         return <PropertyRateUpdate />;
+      case "legal-documents":
+        return <LegalDocuments />;
       default:
         return <UserManagement />;
     }

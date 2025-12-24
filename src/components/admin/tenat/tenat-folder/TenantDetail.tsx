@@ -9,7 +9,7 @@ import {
   Phone,
   Mail,
 } from "lucide-react";
-import { Button } from "../../ui/button";
+import { Button } from "../../../ui/button";
 import { getLeaseRequestById, getProductTypes, getProperties } from "@/lib/api";
 
 interface TenantDetailProps {

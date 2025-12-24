@@ -5,12 +5,11 @@ import { toast } from "sonner";
 import { useLeaseRequests } from "@/hooks/useLeaseRequests";
 import { useTenantData } from "@/hooks/useTenantData";
 import { approveLeaseRequest, rejectLeaseRequest } from "@/lib/api";
-import { FilterType } from "./types";
+import { FilterType } from "../types";
 import { TenantError } from "./TenantError";
-// import { TenantStatistics } from "./TenantStatistics";
-import { TenantFilterTabs } from "./TenantFilterTabs";
-import { TenantTable } from "./TenantTable";
-import { Pagination } from "../../ui/pagination";
+import { TenantFilterTabs } from "../tenat-folder/TenantFilterTabs";
+import { TenantTable } from "../tenat-folder/TenantTable";
+import { Pagination } from "../../../ui/pagination";
 
 interface ApprovedTenantListProps {
   onTenantClick?: (tenantId: number) => void;

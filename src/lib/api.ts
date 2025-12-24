@@ -1182,3 +1182,59 @@ export const updateProperty = async (
   return response;
 };
 
+/**
+ * Get single legal document by ID
+ */
+export const getLegalDocument = async (id: number): Promise<ApiResponse<any>> => {
+  return get(`/v1/legal-documents/${id}`);
+};
+
+/**
+ * Update legal document content
+ */
+export const updateLegalDocumentContent = async (
+  id: number,
+  content: any
+): Promise<ApiResponse<any>> => {
+  return patch(`/v1/legal-documents/${id}/content`, { content });
+};
+
+export const getLegalDocuments = async (
+  page: number = 1,
+  perPage: number = 32,
+  orderby: string = "admin_name",
+  order: string = "asc"
+): Promise<
+  ApiResponse<{
+    data: any[];
+    last_page?: number;
+    current_page?: number;
+    total_pages?: number;
+    total?: number;
+  }>
+> => {
+  return get("/v1/legal-documents", {
+    params: {
+      page,
+      per_page: perPage,
+      orderby,
+      order,
+    },
+  });
+};
+
+/**
+ * Create legal document
+ */
+export const createLegalDocument = async (
+  documentData: {
+    admin_name: string;
+    title?: string;
+    content?: string;
+    status?: string;
+    [key: string]: any;
+  }
+): Promise<ApiResponse<any>> => {
+  return post("/v1/legal-documents", documentData);
+};
+

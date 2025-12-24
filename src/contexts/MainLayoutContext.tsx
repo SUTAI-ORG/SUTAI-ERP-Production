@@ -81,6 +81,8 @@ export function MainLayoutProvider({
         return "utilities";
       case "insurance-management":
         return "components";
+      case "legal-documents":
+        return "other-terms";
       default:
         return null;
     }

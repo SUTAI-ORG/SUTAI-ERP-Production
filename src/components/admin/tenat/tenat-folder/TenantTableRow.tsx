@@ -2,8 +2,8 @@
 
 import React from "react";
 import { Phone, Mail, Check, X } from "lucide-react";
-import { Button } from "../../ui/button";
-import { Tenant } from "./types";
+import { Button } from "../../../ui/button";
+import { Tenant } from "../types";
 
 interface TenantTableRowProps {
   tenant: Tenant;
